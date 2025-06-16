@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia el resto de los archivos del proyecto
 COPY app.py ./
-# Descarga el modelo desde Google Drive (reemplaza FILE_ID por el ID real)
-RUN gdown --id 1Uy22RdNdzZqc-96St6m7jreXZNJq761t -O best_sugarcane_model.keras
+# Descarga el modelo desde Google Drive (usando el enlace completo)
+RUN gdown "https://drive.google.com/file/d/1Uy22RdNdzZqc-96St6m7jreXZNJq761t/view" -O best_sugarcane_model.keras
 
 # Expone el puerto por defecto de Streamlit
 EXPOSE 8501

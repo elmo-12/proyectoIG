@@ -13,10 +13,9 @@ st.set_page_config(page_title="Diagnóstico Caña de Azúcar", page_icon="🌿",
 def load_model():
     model_path = os.path.abspath('best_sugarcane_model.keras')
     if not os.path.exists(model_path):
-        # Reemplaza ENLACE_DIRECTO_O_ID por el enlace o ID real de Google Drive
         st.warning("Descargando el modelo desde Google Drive. Esto puede tardar unos minutos la primera vez...")
         try:
-            gdown.download('1Uy22RdNdzZqc-96St6m7jreXZNJq761t', model_path, quiet=False)
+            gdown.download("https://drive.google.com/file/d/1Uy22RdNdzZqc-96St6m7jreXZNJq761t/view", model_path, quiet=False)
         except Exception as e:
             st.error(f"No se pudo descargar el modelo: {str(e)}")
             return None
