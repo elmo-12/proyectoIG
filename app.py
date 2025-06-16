@@ -5,36 +5,261 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 import os
-import gdown
+import logging
 
-st.set_page_config(page_title="Diagnóstico Caña de Azúcar", page_icon="🌿", layout="centered")
+# Configurar logging
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+tf.get_logger().setLevel('ERROR')
+
+# Configuración de la página con tema oscuro
+st.set_page_config(
+    page_title="Diagnóstico Caña de Azúcar",
+    page_icon="🌿",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Aplicar estilos CSS personalizados con tema oscuro
+st.markdown("""
+    <style>
+        /* Tema oscuro general */
+        .main {
+            background-color: #0E1117;
+            color: #E0E0E0;
+        }
+        
+        /* Estilo para contenedores */
+        .stButton>button {
+            width: 100%;
+            background-color: #2E7D32;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1em;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        .stButton>button:hover {
+            background-color: #388E3C;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        /* Cajas de diagnóstico */
+        .diagnosis-box {
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            background-color: #1E1E1E;
+        }
+        .diagnosis-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+        .healthy {
+            background-color: rgba(46, 125, 50, 0.2);
+            border: 2px solid #2E7D32;
+        }
+        .disease {
+            background-color: rgba(198, 40, 40, 0.2);
+            border: 2px solid #C62828;
+        }
+        
+        /* Tarjetas de información */
+        .info-card {
+            background-color: #1E1E1E;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #333333;
+        }
+        
+        /* Textos y encabezados */
+        h1 {
+            color: #E0E0E0;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5em;
+            font-weight: 700;
+            padding: 1rem;
+            background: linear-gradient(90deg, #1E1E1E, #2E2E2E);
+            border-radius: 10px;
+        }
+        h2 {
+            color: #4CAF50;
+            margin-top: 2rem;
+            font-weight: 600;
+        }
+        h3 {
+            color: #81C784;
+            margin-top: 1.5rem;
+        }
+        
+        /* Contenedor de métricas */
+        .metric-container {
+            background-color: #1E1E1E;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin: 1rem 0;
+            border: 1px solid #333333;
+        }
+        
+        /* Pie de página */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #1E1E1E;
+            margin-top: 3rem;
+            border-top: 1px solid #333333;
+        }
+        
+        /* Listas */
+        .info-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .info-list li {
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            background-color: #252525;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        /* Separadores */
+        hr {
+            border-color: #333333;
+            margin: 2rem 0;
+        }
+        
+        /* Contenedor de imágenes */
+        .image-container {
+            background-color: #1E1E1E;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid #333333;
+        }
+        
+        /* Tooltip personalizado */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem;
+            background-color: #333333;
+            color: white;
+            border-radius: 5px;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        
+        /* Ajustes para el modo oscuro de Streamlit */
+        .stSelectbox, .stTextInput {
+            background-color: #1E1E1E;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Ruta del modelo
+MODEL_DIR = "models"
+MODEL_PATH = os.path.join(MODEL_DIR, "best_sugarcane_model.keras")
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+# Definición de enfermedades y sus detalles
+DISEASE_INFO = {
+    0: {
+        'name': 'Sana',
+        'color': '#4CAF50',
+        'description': 'La planta muestra signos de buena salud sin síntomas de enfermedad.',
+        'symptoms': [
+            'Hojas de color verde intenso',
+            'Crecimiento uniforme',
+            'Ausencia de manchas o lesiones',
+            'Tallos firmes y bien desarrollados'
+        ],
+        'treatment': [
+            'Mantener el programa regular de fertilización',
+            'Continuar con el riego adecuado',
+            'Realizar monitoreos preventivos periódicos',
+            'Mantener buenas prácticas agrícolas'
+        ],
+        'prevention': [
+            'Uso de variedades resistentes',
+            'Mantener buen drenaje del suelo',
+            'Control de malezas',
+            'Rotación de cultivos cuando sea posible'
+        ],
+        'icon': '✅'
+    },
+    1: {
+        'name': 'Pudrición Roja',
+        'color': '#F44336',
+        'description': 'Enfermedad fúngica causada por Colletotrichum falcatum que afecta severamente el rendimiento.',
+        'symptoms': [
+            'Manchas rojas en las hojas y tallos',
+            'Tejido interno rojizo en los tallos',
+            'Marchitamiento de las hojas',
+            'Pérdida de vigor en la planta'
+        ],
+        'treatment': [
+            'Aplicación de fungicida sistémico (carbendazim)',
+            'Eliminación inmediata de plantas infectadas',
+            'Mejora del drenaje del suelo',
+            'Reducción del estrés por sequía'
+        ],
+        'prevention': [
+            'Uso de variedades resistentes',
+            'Tratamiento de esquejes antes de la siembra',
+            'Manejo adecuado del agua',
+            'Control de insectos vectores'
+        ],
+        'icon': '🔴'
+    },
+    2: {
+        'name': 'Tizón Bacterial',
+        'color': '#FF9800',
+        'description': 'Enfermedad bacteriana que afecta principalmente las hojas y puede causar pérdidas significativas.',
+        'symptoms': [
+            'Rayas amarillas que se vuelven necróticas',
+            'Manchas alargadas en las hojas',
+            'Exudado bacterial en lesiones',
+            'Muerte prematura de hojas'
+        ],
+        'treatment': [
+            'Aplicación de bactericidas de cobre',
+            'Mejora de la ventilación del cultivo',
+            'Implementación de sistema de drenaje eficiente',
+            'Reducción de la densidad de siembra'
+        ],
+        'prevention': [
+            'Selección de material de siembra sano',
+            'Desinfección de herramientas',
+            'Manejo adecuado de la fertilización',
+            'Eliminación de residuos de cosecha'
+        ],
+        'icon': '🟡'
+    }
+}
 
 @st.cache_resource
-def load_model():
-    model_path = os.path.abspath('best_sugarcane_model.keras')
-    if not os.path.exists(model_path):
-        st.warning("Descargando el modelo desde Google Drive. Esto puede tardar unos minutos la primera vez...")
-        try:
-            gdown.download("https://drive.google.com/file/d/1Uy22RdNdzZqc-96St6m7jreXZNJq761t/view", model_path, quiet=False)
-        except Exception as e:
-            st.error(f"No se pudo descargar el modelo: {str(e)}")
-            return None
+def load_model(model_path):
     try:
         return tf.keras.models.load_model(model_path)
     except Exception as e:
         st.error(f"Error al cargar el modelo: {str(e)}")
         return None
-
-model = load_model()
-if model is None:
-    st.error("No se pudo cargar el modelo. Por favor, verifica que el archivo del modelo existe y está en el formato correcto.")
-    st.stop()
-
-DISEASE_INFO = {
-    0: {'name': 'Healthy', 'color': '#4CAF50', 'treatment': 'No se requiere tratamiento.'},
-    1: {'name': 'Red Rot', 'color': '#F44336', 'treatment': 'Aplicar carbendazim, eliminar plantas infectadas.'},
-    2: {'name': 'Bacterial Blight', 'color': '#FF9800', 'treatment': 'Aplicar bactericidas y mejorar drenaje.'}
-}
 
 def preprocess_image(image: Image.Image):
     img = np.array(image)
@@ -49,33 +274,217 @@ def preprocess_image(image: Image.Image):
     img = img / 255.0
     return np.expand_dims(img, axis=0)
 
-st.title("🌿 Diagnóstico de Enfermedades en Hojas de Caña de Azúcar")
-uploaded_file = st.file_uploader("📷 Sube una imagen de hoja", type=["jpg", "jpeg", "png"])
+def create_probability_chart(prediction, disease_info):
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(figsize=(10, 5))
+    fig.patch.set_facecolor('#1E1E1E')
+    ax.set_facecolor('#1E1E1E')
+    
+    # Crear barras
+    bars = ax.bar(
+        [info['name'] for info in disease_info.values()],
+        prediction[0] * 100,
+        color=[info['color'] for info in disease_info.values()]
+    )
+    
+    # Configurar ejes
+    ax.set_ylabel("Probabilidad (%)")
+    ax.set_ylim([0, 100])
+    plt.xticks(rotation=15)
+    
+    # Añadir valores sobre las barras
+    for bar in bars:
+        height = bar.get_height()
+        ax.text(
+            bar.get_x() + bar.get_width()/2.,
+            height,
+            f'{height:.1f}%',
+            ha='center',
+            va='bottom',
+            color='white'
+        )
+    
+    return fig
 
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Imagen cargada", use_column_width=True)
+# Título principal con diseño mejorado
+st.markdown("<h1>🌿 Sistema Experto de Diagnóstico de Enfermedades en Caña de Azúcar</h1>", unsafe_allow_html=True)
 
-    if st.button("🔍 Diagnosticar"):
-        with st.spinner("Procesando..."):
-            processed = preprocess_image(image)
-            prediction = model.predict(processed)[0]
-            predicted_class = int(np.argmax(prediction))
-            confidence = float(np.max(prediction) * 100)
-            disease = DISEASE_INFO[predicted_class]
+# Inicialización del estado de la sesión
+if 'model_loaded' not in st.session_state:
+    st.session_state.model_loaded = False
 
-        st.success("✅ Diagnóstico completado")
-        st.markdown(f"### 🩺 Resultado: **{disease['name']}**")
-        st.metric(label="Confianza", value=f"{confidence:.2f} %")
-        st.markdown("### 💊 Tratamiento recomendado:")
-        st.code(disease['treatment'])
+# Crear pestañas para mejor organización
+tab1, tab2 = st.tabs(["📤 Configuración", "🔍 Diagnóstico"])
 
-        st.markdown("### 📊 Distribución de Probabilidades")
-        fig, ax = plt.subplots()
-        labels = [info['name'] for info in DISEASE_INFO.values()]
-        colors = [info['color'] for info in DISEASE_INFO.values()]
-        ax.bar(labels, prediction * 100, color=colors)
-        ax.set_ylabel("Probabilidad (%)")
-        ax.set_ylim([0, 100])
-        plt.xticks(rotation=15)
-        st.pyplot(fig)
+with tab1:
+    st.markdown("### Configuración del Modelo")
+    with st.expander("ℹ️ Información del Sistema", expanded=True):
+        st.markdown("""
+            <div class='info-card'>
+                <h3>Sobre el Sistema</h3>
+                <p>Este sistema experto utiliza inteligencia artificial para detectar:</p>
+                <ul class='info-list'>
+                    <li>✅ Plantas Sanas</li>
+                    <li>🔴 Pudrición Roja</li>
+                    <li>🟡 Tizón Bacterial</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    model_file = st.file_uploader("Cargar modelo (.keras)", type=['keras', 'h5'])
+    if model_file is not None:
+        with st.spinner("⏳ Cargando modelo..."):
+            with open(MODEL_PATH, 'wb') as f:
+                f.write(model_file.getbuffer())
+            st.success("✅ Modelo cargado exitosamente")
+            st.session_state.model_loaded = True
+
+# Cargar el modelo si existe
+model = None
+if os.path.exists(MODEL_PATH):
+    model = load_model(MODEL_PATH)
+    if model is not None and not st.session_state.model_loaded:
+        st.success("✅ Modelo cargado exitosamente")
+        st.session_state.model_loaded = True
+
+with tab2:
+    if not st.session_state.model_loaded:
+        st.warning("⚠️ Por favor, carga primero el modelo en la pestaña de Configuración")
+    else:
+        # Crear columnas para mejor organización
+        col1, col2 = st.columns([1, 1.5])
+        
+        with col1:
+            st.markdown("### Cargar Imagen")
+            image_file = st.file_uploader("Seleccionar imagen de hoja", type=['jpg', 'jpeg', 'png'])
+            
+            if image_file is not None:
+                with st.container():
+                    st.markdown("<div class='image-container'>", unsafe_allow_html=True)
+                    image = Image.open(image_file)
+                    st.image(image, caption="Imagen cargada", use_column_width=True)
+                    st.markdown("</div>", unsafe_allow_html=True)
+                
+                if st.button("🔍 Realizar Diagnóstico", use_container_width=True):
+                    with st.spinner("🔄 Analizando imagen..."):
+                        processed_image = preprocess_image(image)
+                        prediction = model.predict(processed_image)
+                        predicted_class = np.argmax(prediction[0])
+                        confidence = prediction[0][predicted_class] * 100
+                        disease_info = DISEASE_INFO[predicted_class]
+                        
+                        with col2:
+                            # Resultados principales
+                            box_class = "healthy" if predicted_class == 0 else "disease"
+                            st.markdown(f"""
+                                <div class='diagnosis-box {box_class}'>
+                                    <h2>{disease_info['icon']} Diagnóstico</h2>
+                                    <div class='metric-container'>
+                                        <p style='font-size: 1.8em; font-weight: bold; margin: 0.5rem 0;'>
+                                            {disease_info['name']}
+                                        </p>
+                                        <p style='font-size: 1.2em; margin: 1rem 0;'>
+                                            Nivel de confianza:
+                                            <span style='font-size: 1.4em; font-weight: bold; color: {disease_info['color']};'>
+                                                {confidence:.1f}%
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Crear pestañas para la información detallada
+                            info_tab1, info_tab2, info_tab3 = st.tabs(["📋 Detalles", "💊 Tratamiento", "📊 Análisis"])
+                            
+                            with info_tab1:
+                                st.markdown("<h3 style='color: #81C784; margin-bottom: 1rem;'>📋 Descripción</h3>", unsafe_allow_html=True)
+                                st.markdown(
+                                    f"""
+                                    <div style='
+                                        background-color: #252525;
+                                        margin: 0.5rem 0;
+                                        padding: 0.75rem;
+                                        border-radius: 5px;
+                                        color: #E0E0E0;
+                                    '>
+                                        {disease_info['description']}
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+                                
+                                st.markdown("<h3 style='color: #81C784; margin-top: 2rem; margin-bottom: 1rem;'>🔍 Síntomas</h3>", unsafe_allow_html=True)
+                                for symptom in disease_info['symptoms']:
+                                    st.markdown(
+                                        f"""
+                                        <div style='
+                                            background-color: #252525;
+                                            margin: 0.5rem 0;
+                                            padding: 0.75rem;
+                                            border-radius: 5px;
+                                            border-left: 4px solid #4CAF50;
+                                            color: #E0E0E0;
+                                        '>
+                                            {symptom}
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+
+                            with info_tab2:
+                                st.markdown("<h3 style='color: #81C784; margin-bottom: 1rem;'>💊 Tratamiento Recomendado</h3>", unsafe_allow_html=True)
+                                
+                                # Contenedor para tratamientos
+                                for treatment in disease_info['treatment']:
+                                    st.markdown(
+                                        f"""
+                                        <div style='
+                                            background-color: #252525;
+                                            margin: 0.5rem 0;
+                                            padding: 0.75rem;
+                                            border-radius: 5px;
+                                            border-left: 4px solid #4CAF50;
+                                            color: #E0E0E0;
+                                        '>
+                                            {treatment}
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                                
+                                st.markdown("<h3 style='color: #81C784; margin-top: 2rem; margin-bottom: 1rem;'>🛡️ Medidas Preventivas</h3>", unsafe_allow_html=True)
+                                
+                                # Contenedor para medidas preventivas
+                                for prevention in disease_info['prevention']:
+                                    st.markdown(
+                                        f"""
+                                        <div style='
+                                            background-color: #252525;
+                                            margin: 0.5rem 0;
+                                            padding: 0.75rem;
+                                            border-radius: 5px;
+                                            border-left: 4px solid #FF9800;
+                                            color: #E0E0E0;
+                                        '>
+                                            {prevention}
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+
+                            with info_tab3:
+                                st.markdown("### 📊 Distribución de Probabilidades")
+                                fig = create_probability_chart(prediction, DISEASE_INFO)
+                                st.pyplot(fig)
+
+# Pie de página
+st.markdown("---")
+st.markdown("""
+    <div class='footer'>
+        <h3>🌿 Sistema Experto de Diagnóstico</h3>
+        <p>Desarrollado para la identificación temprana y el manejo efectivo de enfermedades en cultivos de caña de azúcar</p>
+        <p style='color: #666; font-size: 0.9em; margin-top: 1rem;'>
+            Utilizando inteligencia artificial y aprendizaje profundo para diagnósticos precisos
+        </p>
+    </div>
+""", unsafe_allow_html=True)

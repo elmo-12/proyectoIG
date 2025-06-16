@@ -4,19 +4,38 @@ FROM python:3.10-slim
 # Establece el directorio de trabajo
 WORKDIR /app
 
+# Variables de entorno para reducir mensajes de TensorFlow
+ENV PYTHONWARNINGS="ignore"
+ENV TF_CPP_MIN_LOG_LEVEL="3"
+ENV CUDA_VISIBLE_DEVICES="-1"
+ENV TF_ENABLE_ONEDNN_OPTS="0"
+
+# Instalar dependencias del sistema para OpenCV y otras herramientas
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copia los archivos de dependencias
 COPY requirements.txt ./
 
-# Instala las dependencias
+# Instala las dependencias Python
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install opencv-python-headless --no-cache-dir
 
-# Copia el resto de los archivos del proyecto
-COPY app.py ./
-# Descarga el modelo desde Google Drive (usando el enlace completo)
-RUN gdown "https://drive.google.com/file/d/1Uy22RdNdzZqc-96St6m7jreXZNJq761t/view" -O best_sugarcane_model.keras
+# Crear directorio para modelos y configuración
+RUN mkdir -p /app/models
+RUN mkdir -p /root/.streamlit
+
+# Copia el código de la aplicación y la configuración
+COPY . /app/
+COPY .streamlit/config.toml /root/.streamlit/
+
+# Asegura que el directorio app y models tengan los permisos correctos
+RUN chmod -R 777 /app
 
 # Expone el puerto por defecto de Streamlit
 EXPOSE 8501
 
-# Comando para ejecutar la app
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"] 
+# Comando para ejecutar la app con límite de carga aumentado
+CMD ["streamlit", "run", "app.py", "--server.maxUploadSize=500", "--server.port=8501", "--server.address=0.0.0.0"]
