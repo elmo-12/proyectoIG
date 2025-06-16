@@ -35,7 +35,7 @@ COPY .streamlit/config.toml /root/.streamlit/
 RUN chmod -R 777 /app
 
 # Expone el puerto por defecto de Streamlit
-EXPOSE 8501
+EXPOSE 8123
 
 # Comando para ejecutar la app con límite de carga aumentado
-CMD ["streamlit", "run", "app.py", "--server.maxUploadSize=500", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.maxUploadSize=500", "--server.port=8123", "--server.address=0.0.0.0"]
