@@ -14,22 +14,28 @@ ENV TF_ENABLE_ONEDNN_OPTS="0"
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia los archivos de dependencias
 COPY requirements.txt ./
 
 # Instala las dependencias Python
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install opencv-python-headless --no-cache-dir
 
 # Crear directorio para modelos y configuración
 RUN mkdir -p /app/models
 RUN mkdir -p /root/.streamlit
 
-# Copia el código de la aplicación y la configuración
+# Copia el código de la aplicación
 COPY . /app/
-COPY .streamlit/config.toml /root/.streamlit/
+
+# Crear archivo de configuración de Streamlit si no existe
+RUN echo '[server]\nmaxUploadSize = 500\nport = 8123\naddress = "0.0.0.0"' > /root/.streamlit/config.toml
 
 # Asegura que el directorio app y models tengan los permisos correctos
 RUN chmod -R 777 /app
@@ -37,5 +43,5 @@ RUN chmod -R 777 /app
 # Expone el puerto por defecto de Streamlit
 EXPOSE 8123
 
-# Comando para ejecutar la app con límite de carga aumentado
+# Comando para ejecutar la app
 CMD ["streamlit", "run", "app.py", "--server.maxUploadSize=500", "--server.port=8123", "--server.address=0.0.0.0"]

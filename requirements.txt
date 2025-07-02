@@ -4,4 +4,9 @@ numpy==1.26.4
 opencv-python==4.7.0.72
 matplotlib==3.7.1
 pillow==9.5.0
+seaborn==0.12.2
+scikit-learn==1.2.2
 gdown==4.7.1
+fpdf==1.7.2
+pandas==2.0.3
+plotly==5.15.0
