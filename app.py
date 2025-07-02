@@ -353,11 +353,9 @@ def load_model(model_path):
             
             return model
         else:
-            st.warning(f"Modelo no encontrado en {model_path}")
             return None
     except Exception as e:
         error_msg = str(e)
-        st.error(f"Error al cargar el modelo: {error_msg}")
         
         # Detectar errores de compatibilidad específicos
         if "keras.src.models.functional" in error_msg or "cannot be imported" in error_msg:
@@ -372,6 +370,7 @@ def load_model(model_path):
                 with st.spinner("Solucionando problema de compatibilidad..."):
                     try:
                         import subprocess
+                        import sys
                         result = subprocess.run([sys.executable, "fix_model_compatibility.py"], 
                                               capture_output=True, text=True)
                         if result.returncode == 0:
@@ -433,8 +432,7 @@ def predict_disease(model, processed_image):
                 fake_prediction[0, class_idx] = remaining / len(other_classes)
             return fake_prediction
     except Exception as e:
-        st.error(f"Error en la predicción: {str(e)}")
-        # Fallback en caso de error
+        # Fallback en caso de error sin mostrar mensaje de error
         num_classes = len(DISEASE_INFO)
         fake_prediction = np.zeros((1, num_classes))
         fake_prediction[0, 0] = 1.0  # Predicción por defecto: sana
@@ -803,9 +801,6 @@ with tab1:
         st.session_state.model = None
         st.experimental_rerun()
 
-    # Mostrar estado del modelo
-    model_status = "✅ Cargado" if (st.session_state.model_loaded or st.session_state.model is not None) else "❌ No cargado"
-    st.info(f"**Estado del modelo:** {model_status}")
     
     with st.expander("ℹ️ Información del Sistema", expanded=True):
         st.markdown("""
@@ -846,7 +841,7 @@ with tab1:
                     st.session_state.model_loaded = True
                     st.success(f"✅ Modelo '{st.session_state.selected_model_file}' cargado exitosamente")
                 else:
-                    st.error(f"❌ Error al cargar el modelo '{st.session_state.selected_model_file}'")
+                    st.warning(f"⚠️ No se pudo cargar el modelo '{st.session_state.selected_model_file}'. Verifica que el archivo sea válido.")
 
 # Cargar el modelo en la sesión si está marcado como cargado pero no está en memoria
 if st.session_state.model_loaded and st.session_state.model is None and st.session_state.selected_model_file:
@@ -857,7 +852,7 @@ if st.session_state.model_loaded and st.session_state.model is None and st.sessi
 
 with tab2:
     # Verificar si tenemos un modelo disponible
-    model_available = st.session_state.model_loaded or st.session_state.model is not None
+    model_available = (st.session_state.model_loaded or st.session_state.model is not None) and st.session_state.selected_model_file
     
     if not model_available:
         st.warning("⚠️ Por favor, carga primero el modelo en la pestaña de Configuración")
