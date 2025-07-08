@@ -1,0 +1,15 @@
+> Test Loss     : 1.2410
+> Test Accuracy : 0.5050
+
+— Classification report —
+              precision    recall  f1-score   support
+
+     Healthy       0.58      0.57      0.57       105
+      Mosaic       0.39      0.66      0.49        92
+      RedRot       0.56      0.58      0.57       104
+        Rust       0.53      0.71      0.61       103
+      Yellow       1.00      0.01      0.02       101
+
+    accuracy                           0.50       505
+   macro avg       0.61      0.51      0.45       505
+weighted avg       0.61      0.50      0.45       505

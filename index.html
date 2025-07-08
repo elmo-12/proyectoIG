@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Iframe a pantalla completa</title>
+  <style>
+    /* Elimina márgenes y hace que html/body ocupen el 100% */
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    /* El iframe cubre todo el viewport */
+    #fullframe {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Iframe que ocupa todo el viewport -->
+  <iframe
+    id="fullframe"
+    src="https://sedalib.com.pe"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-popups"
+  ></iframe>
+  
+  <script>
+    window.chatwootSettings = {"position":"left","type":"standard","launcherTitle":"Chat with us"};
+    (function(d,t) {
+      var BASE_URL="https://crm.elitecode.lat";
+      var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src=BASE_URL+"/packs/js/sdk.js";
+      g.defer = true;
+      g.async = true;
+      s.parentNode.insertBefore(g,s);
+      g.onload=function(){
+        window.chatwootSDK.run({
+          websiteToken: 'GKG2fysur8gFqFv1ovWZWkA9',
+          baseUrl: BASE_URL
+        })
+      }
+    })(document,"script");
+  </script>
+  
+</body>
+</html>
