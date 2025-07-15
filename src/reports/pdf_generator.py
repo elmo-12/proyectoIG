@@ -9,6 +9,7 @@ from typing import Dict, Optional, Any
 import numpy as np
 from PIL import Image
 import streamlit as st
+import matplotlib.pyplot as plt
 
 from ..config.settings import PDF_CONFIG, get_temp_dir
 from ..utils.text_utils import clean_text_robust
@@ -19,10 +20,10 @@ from ..utils.i18n import t
 # Detectar bibliotecas PDF disponibles
 try:
     from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as ReportLabImage
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as ReportLabImage, Table, TableStyle, PageBreak
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
-    from reportlab.lib.colors import HexColor
+    from reportlab.lib.colors import HexColor, colors
     REPORTLAB_AVAILABLE = True
 except ImportError:
     REPORTLAB_AVAILABLE = False
@@ -68,9 +69,9 @@ class PDFReportGenerator:
             # Asegurar que el directorio temporal existe y es accesible
             temp_dir = get_temp_dir()
             
-            # Generar un nombre único para el archivo PDF
+            # Generar un nombre único para el archivo PDF usando el idioma actual
             timestamp = int(time.time())
-            pdf_filename = f"reporte_diagnostico_cana_{timestamp}.pdf"
+            pdf_filename = f"{t('pdf.report_filename')}_{timestamp}.pdf"
             pdf_path = os.path.join(temp_dir, pdf_filename)
             
             if REPORTLAB_AVAILABLE:
@@ -97,7 +98,7 @@ class PDFReportGenerator:
                 return None
                 
         except Exception as e:
-            st.error(f"❌ Error al generar PDF: {str(e)}")
+            st.error(f"❌ {t('pdf.generation_error')}: {str(e)}")
             return None
     
     def _show_pdf_error(self):
@@ -298,31 +299,136 @@ class PDFReportGenerator:
         """Añadir sección de gráficos (ReportLab)"""
         story.append(Paragraph(f"<b>{t('pdf.visual_analysis')}:</b>", styles['Heading2']))
         
-        # Crear y guardar gráfico
-        if consensus_prediction is not None:
-            fig = self.chart_generator.create_probability_chart(
-                consensus_prediction, 
-                t('pdf.probability_distribution_consensus')
-            )
-        else:
-            fig = self.chart_generator.create_probability_chart(
-                probabilities, 
-                t('pdf.probability_distribution')
-            )
+        try:
+            # Gráfico de probabilidades
+            if consensus_prediction is not None:
+                fig = self.chart_generator.create_probability_chart_for_pdf(
+                    consensus_prediction, 
+                    t('pdf.probability_distribution_consensus')
+                )
+            else:
+                fig = self.chart_generator.create_probability_chart_for_pdf(
+                    probabilities, 
+                    t('pdf.probability_distribution')
+                )
+            
+            # Guardar gráfico de probabilidades
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_chart:
+                fig.savefig(tmp_chart.name, bbox_inches='tight', dpi=150, facecolor='white', edgecolor='none')
+                temp_files.append(tmp_chart.name)
+                plt.close(fig)
+                story.append(ReportLabImage(tmp_chart.name, width=6*inch, height=4*inch))
+                story.append(Spacer(1, 20))
+            
+            # Gráfico comparativo si hay múltiples modelos
+            if all_predictions and len(all_predictions) > 1:
+                story.append(Paragraph(f"<b>{t('pdf.model_comparison')}:</b>", styles['Heading3']))
+                fig_comp = self.chart_generator.create_comparative_chart_for_pdf(all_predictions)
+                
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_comp:
+                    fig_comp.savefig(tmp_comp.name, bbox_inches='tight', dpi=150, facecolor='white', edgecolor='none')
+                    temp_files.append(tmp_comp.name)
+                    plt.close(fig_comp)
+                    story.append(ReportLabImage(tmp_comp.name, width=7*inch, height=4*inch))
+                    story.append(Spacer(1, 20))
+            
+            # Matriz de confusión
+            model_name = st.session_state.get('selected_model_file', None)
+            if model_name is None and all_predictions:
+                # Si no hay modelo seleccionado pero hay predicciones, usar el primer modelo
+                model_name = list(all_predictions.keys())[0]
+            
+            if model_name:
+                confusion_path = self.model_manager.get_confusion_matrix_path(model_name)
+                if confusion_path and os.path.exists(confusion_path):
+                    story.append(PageBreak())  # Nueva página para la matriz
+                    story.append(Paragraph(f"<b>{t('pdf.confusion_matrix')}</b>", styles['Heading3']))
+                    story.append(ReportLabImage(confusion_path, width=6*inch, height=4*inch))
+                    story.append(Spacer(1, 20))
         
-        # Crear archivo temporal sin eliminarlo inmediatamente
-        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_chart:
-            fig.savefig(tmp_chart.name, bbox_inches='tight', dpi=150)
-            temp_files.append(tmp_chart.name)  # Agregar a la lista para limpiar después
-        
-        # Cerrar la figura
-        import matplotlib.pyplot as plt
-        plt.close(fig)
-        
-        # Añadir al PDF
-        story.append(ReportLabImage(tmp_chart.name, width=6*inch, height=4*inch))
-        story.append(Spacer(1, 20))
-    
+        except Exception as e:
+            st.error(f"Error generando gráficos: {str(e)}")
+            plt.close('all')  # Cerrar todas las figuras en caso de error
+            
+        # Información técnica y métricas
+        if model_name := st.session_state.get('selected_model_file'):
+            model_info = self.model_manager.load_model_info(model_name)
+            if model_info:
+                story.append(Paragraph(f"<b>{t('pdf.model_metrics')}:</b>", styles['Heading3']))
+                
+                # Métricas principales
+                metrics_style = ParagraphStyle(
+                    'Metrics',
+                    parent=styles['Normal'],
+                    fontSize=10,
+                    leading=14
+                )
+                story.append(Paragraph(f"Test Loss: {model_info['test_loss']:.4f}", metrics_style))
+                story.append(Paragraph(f"Test Accuracy: {model_info['test_accuracy']:.4f}", metrics_style))
+                story.append(Spacer(1, 10))
+                
+                # Tabla de clasificación
+                if 'classification_report' in model_info:
+                    report_style = ParagraphStyle(
+                        'Report',
+                        parent=styles['Code'],
+                        fontSize=8,
+                        leading=10,
+                        fontName='Courier'
+                    )
+                    story.append(Paragraph(f"<b>{t('pdf.classification_report')}:</b>", styles['Heading4']))
+                    story.append(Spacer(1, 5))
+                    
+                    # Crear tabla de clasificación
+                    table_data = [
+                        ['', 'precision', 'recall', 'f1-score', 'support'],
+                    ]
+                    
+                    # Añadir datos de cada clase
+                    for class_name in ['Healthy', 'Mosaic', 'RedRot', 'Rust', 'Yellow']:
+                        if class_name in model_info['classification_report']:
+                            metrics = model_info['classification_report'][class_name]
+                            table_data.append([
+                                class_name,
+                                f"{metrics['precision']:.2f}",
+                                f"{metrics['recall']:.2f}",
+                                f"{metrics['f1-score']:.2f}",
+                                str(metrics['support'])
+                            ])
+                    
+                    # Añadir promedios
+                    for avg_type in ['accuracy', 'macro avg', 'weighted avg']:
+                        if avg_type in model_info['classification_report']:
+                            metrics = model_info['classification_report'][avg_type]
+                            row = [avg_type]
+                            if avg_type == 'accuracy':
+                                row.extend(['', '', f"{metrics:.2f}", str(model_info['classification_report']['support'])])
+                            else:
+                                row.extend([
+                                    f"{metrics['precision']:.2f}",
+                                    f"{metrics['recall']:.2f}",
+                                    f"{metrics['f1-score']:.2f}",
+                                    str(metrics['support'])
+                                ])
+                            table_data.append(row)
+                    
+                    # Crear y estilizar la tabla
+                    table_style = TableStyle([
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('FONTSIZE', (0, 0), (-1, -1), 8),
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                        ('BOX', (0, 0), (-1, -1), 2, colors.black),
+                        ('LINEBELOW', (0, 0), (-1, 0), 2, colors.black),
+                    ])
+                    
+                    table = Table(table_data)
+                    table.setStyle(table_style)
+                    story.append(table)
+                    story.append(Spacer(1, 20))
+
     def _add_technical_info(self, story, styles, model_name):
         """Añadir información técnica (ReportLab)"""
         if model_name:
@@ -331,12 +437,6 @@ class PDFReportGenerator:
                 story.append(Paragraph(f"<b>{t('pdf.technical_info')}:</b>", styles['Heading2']))
                 story.append(Paragraph(f"{t('pdf.accuracy')}: {model_info['test_accuracy']:.2%}", styles['Normal']))
                 story.append(Paragraph(f"{t('pdf.loss')}: {model_info['test_loss']:.4f}", styles['Normal']))
-            
-            # Matriz de confusión
-            confusion_path = self.model_manager.get_confusion_matrix_path(model_name)
-            if confusion_path and os.path.exists(confusion_path):
-                story.append(Paragraph(f"<b>{t('pdf.confusion_matrix')}:</b>", styles['Heading3']))
-                story.append(ReportLabImage(confusion_path, width=6*inch, height=4*inch))
     
     def _add_fpdf_header(self, pdf, all_predictions):
         """Añadir encabezado FPDF"""
@@ -347,7 +447,7 @@ class PDFReportGenerator:
         pdf.set_font("Arial", 'B', 20)
         pdf.set_text_color(46, 125, 50)
         
-        title = "Diagnostico Comparativo de Cana de Azucar" if all_predictions and len(all_predictions) > 1 else "Diagnostico de Cana de Azucar"
+        title = t('pdf.comparative_diagnosis_title') if all_predictions and len(all_predictions) > 1 else t('pdf.diagnosis_title')
         pdf.cell(0, 15, clean_text_robust(title), ln=1, align='C')
         pdf.ln(10)
         
@@ -425,29 +525,152 @@ class PDFReportGenerator:
     
     def _add_fpdf_charts(self, pdf, probabilities, all_predictions, consensus_prediction, temp_files):
         """Añadir gráficos FPDF"""
-        # Gráfico de probabilidades
-        pdf.set_font("Arial", 'B', 12)
-        pdf.set_text_color(76, 175, 80)
-        pdf.cell(0, 8, clean_text_robust("Analisis de Probabilidades:"), ln=1)
+        try:
+            # Gráfico de probabilidades
+            pdf.set_font("Arial", 'B', 12)
+            pdf.set_text_color(76, 175, 80)
+            pdf.cell(0, 8, clean_text_robust(t('pdf.probability_analysis')), ln=1)
+            
+            # Crear y guardar gráfico de probabilidades
+            if consensus_prediction is not None:
+                fig = self.chart_generator.create_probability_chart_for_pdf(consensus_prediction)
+            else:
+                fig = self.chart_generator.create_probability_chart_for_pdf(probabilities)
+            
+            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_chart:
+                fig.savefig(tmp_chart.name, bbox_inches='tight', dpi=150, facecolor='white', edgecolor='none')
+                temp_files.append(tmp_chart.name)
+                plt.close(fig)
+                pdf.image(tmp_chart.name, x=25, w=160, h=80)
+                pdf.ln(10)
+            
+            # Gráfico comparativo si hay múltiples modelos
+            if all_predictions and len(all_predictions) > 1:
+                pdf.set_font("Arial", 'B', 12)
+                pdf.set_text_color(76, 175, 80)
+                pdf.cell(0, 8, clean_text_robust(t('pdf.model_comparison')), ln=1)
+                
+                fig_comp = self.chart_generator.create_comparative_chart_for_pdf(all_predictions)
+                with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_comp:
+                    fig_comp.savefig(tmp_comp.name, bbox_inches='tight', dpi=150, facecolor='white', edgecolor='none')
+                    temp_files.append(tmp_comp.name)
+                    plt.close(fig_comp)
+                    pdf.image(tmp_comp.name, x=15, w=180, h=90)
+                    pdf.ln(10)
+            
+            # Matriz de confusión
+            model_name = st.session_state.get('selected_model_file', None)
+            if model_name is None and all_predictions:
+                # Si no hay modelo seleccionado pero hay predicciones, usar el primer modelo
+                model_name = list(all_predictions.keys())[0]
+            
+            if model_name:
+                confusion_path = self.model_manager.get_confusion_matrix_path(model_name)
+                if confusion_path and os.path.exists(confusion_path):
+                    pdf.add_page()  # Nueva página para la matriz
+                    pdf.set_font("Arial", 'B', 14)
+                    pdf.set_text_color(46, 125, 50)
+                    pdf.cell(0, 10, clean_text_robust(t('pdf.confusion_matrix')), ln=1)
+                    pdf.ln(5)
+                    pdf.image(confusion_path, x=20, w=170, h=120)
+                    pdf.ln(10)
         
-        # Crear y guardar gráfico
-        if consensus_prediction is not None:
-            fig = self.chart_generator.create_probability_chart(consensus_prediction)
-        else:
-            fig = self.chart_generator.create_probability_chart(probabilities)
-        
-        # Crear archivo temporal sin eliminarlo inmediatamente
-        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_chart:
-            fig.savefig(tmp_chart.name, bbox_inches='tight', dpi=150)
-            temp_files.append(tmp_chart.name)  # Agregar a la lista para limpiar después
-        
-        # Cerrar la figura
-        import matplotlib.pyplot as plt
-        plt.close(fig)
-        
-        # Añadir al PDF
-        pdf.image(tmp_chart.name, x=25, w=160, h=80)
-        pdf.ln(10)
+        except Exception as e:
+            st.error(f"Error generando gráficos: {str(e)}")
+            plt.close('all')  # Cerrar todas las figuras en caso de error
+            
+        # Información técnica y métricas
+        model_name = st.session_state.get('selected_model_file', None)
+        if model_name is None and all_predictions:
+            # Si no hay modelo seleccionado pero hay predicciones, usar el primer modelo
+            model_name = list(all_predictions.keys())[0]
+            
+        if model_name:
+            model_info = self.model_manager.load_model_info(model_name)
+            if model_info:
+                pdf.set_font("Arial", 'B', 12)
+                pdf.set_text_color(76, 175, 80)
+                pdf.cell(0, 8, clean_text_robust(t('pdf.model_metrics')), ln=1)
+                
+                # Métricas principales
+                pdf.set_font("Arial", '', 10)
+                pdf.set_text_color(0, 0, 0)
+                pdf.cell(0, 6, clean_text_robust(f"Test Loss: {model_info['test_loss']:.4f}"), ln=1)
+                pdf.cell(0, 6, clean_text_robust(f"Test Accuracy: {model_info['test_accuracy']:.4f}"), ln=1)
+                pdf.ln(5)
+                
+                # Tabla de clasificación
+                if 'classification_report' in model_info:
+                    pdf.set_font("Arial", 'B', 11)
+                    pdf.cell(0, 8, clean_text_robust(t('pdf.classification_report')), ln=1)
+                    pdf.ln(2)
+                    
+                    # Encabezados de la tabla
+                    pdf.set_font("Arial", 'B', 8)
+                    col_width = 35
+                    pdf.cell(col_width, 6, "Clase", 1, 0, 'C')
+                    for header in ['Precision', 'Recall', 'F1-Score', 'Support']:
+                        pdf.cell(col_width, 6, header, 1, 0, 'C')
+                    pdf.ln()
+                    
+                    # Datos de la tabla
+                    pdf.set_font("Arial", '', 8)
+                    for class_name in ['Healthy', 'Mosaic', 'RedRot', 'Rust', 'Yellow']:
+                        if class_name in model_info['classification_report']:
+                            metrics = model_info['classification_report'][class_name]
+                            pdf.cell(col_width, 6, class_name, 1, 0, 'L')
+                            pdf.cell(col_width, 6, f"{metrics['precision']:.2f}", 1, 0, 'C')
+                            pdf.cell(col_width, 6, f"{metrics['recall']:.2f}", 1, 0, 'C')
+                            pdf.cell(col_width, 6, f"{metrics['f1-score']:.2f}", 1, 0, 'C')
+                            pdf.cell(col_width, 6, str(metrics['support']), 1, 1, 'C')
+                    
+                    # Promedios
+                    for avg_type in ['accuracy', 'macro avg', 'weighted avg']:
+                        if avg_type in model_info['classification_report']:
+                            metrics = model_info['classification_report'][avg_type]
+                            pdf.cell(col_width, 6, avg_type, 1, 0, 'L')
+                            if avg_type == 'accuracy':
+                                pdf.cell(col_width, 6, '', 1, 0, 'C')
+                                pdf.cell(col_width, 6, '', 1, 0, 'C')
+                                pdf.cell(col_width, 6, f"{metrics:.2f}", 1, 0, 'C')
+                                pdf.cell(col_width, 6, str(model_info['classification_report']['support']), 1, 1, 'C')
+                            else:
+                                pdf.cell(col_width, 6, f"{metrics['precision']:.2f}", 1, 0, 'C')
+                                pdf.cell(col_width, 6, f"{metrics['recall']:.2f}", 1, 0, 'C')
+                                pdf.cell(col_width, 6, f"{metrics['f1-score']:.2f}", 1, 0, 'C')
+                                pdf.cell(col_width, 6, str(metrics['support']), 1, 1, 'C')
+                    pdf.ln(10)
+                    
+                    # Matriz de confusión
+                    confusion_matrix_path = self.model_manager.get_confusion_matrix_path(model_name)
+                    if confusion_matrix_path and os.path.exists(confusion_matrix_path):
+                        try:
+                            # Intentar cargar la imagen con PIL primero para verificar que es válida
+                            from PIL import Image
+                            confusion_img = Image.open(confusion_matrix_path)
+                            
+                            # Si la imagen se carga correctamente, agregarla al PDF
+                            pdf.add_page()  # Añadir nueva página para la matriz
+                            pdf.set_font("Arial", 'B', 14)
+                            pdf.set_text_color(76, 175, 80)
+                            pdf.cell(0, 10, clean_text_robust(t('pdf.confusion_matrix')), ln=1, align='C')
+                            pdf.ln(5)
+                            
+                            # Crear una copia temporal de la imagen
+                            with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_confusion:
+                                confusion_img.save(tmp_confusion.name, format='PNG')
+                                temp_files.append(tmp_confusion.name)
+                                
+                                # Calcular dimensiones para centrar la imagen
+                                page_width = pdf.w - 2 * pdf.l_margin
+                                image_width = page_width * 0.9  # 90% del ancho de la página
+                                image_height = image_width * 0.75  # Mantener proporción
+                                x = (pdf.w - image_width) / 2
+                                
+                                pdf.image(tmp_confusion.name, x=x, w=image_width, h=image_height)
+                                pdf.ln(10)
+                        except Exception as img_error:
+                            st.error(f"Error al cargar la matriz de confusión: {str(img_error)}")
     
     def _add_fpdf_technical_info(self, pdf, model_name):
         """Añadir información técnica FPDF"""

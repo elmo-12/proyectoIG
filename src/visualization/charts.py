@@ -1,6 +1,8 @@
 """
 Módulo de visualización para gráficos y charts
 """
+import matplotlib
+matplotlib.use('Agg')  # Necesario para entornos sin interfaz gráfica
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -74,6 +76,60 @@ class ChartGenerator:
         
         return fig
     
+    def create_probability_chart_for_pdf(self, prediction: np.ndarray, 
+                                       title: str = None) -> plt.Figure:
+        """
+        Crear gráfico de barras con probabilidades por clase optimizado para PDF
+        
+        Args:
+            prediction (np.ndarray): Predicciones del modelo
+            title (str): Título del gráfico
+            
+        Returns:
+            plt.Figure: Figura de matplotlib
+        """
+        fig, ax = plt.subplots(figsize=self.config['figure_size'])
+        fig.patch.set_facecolor('white')
+        ax.set_facecolor('white')
+        
+        # Obtener nombres y probabilidades traducidos
+        class_names = get_disease_names_translated()
+        probabilities = prediction[0] * 100
+        colors = get_disease_colors()
+        
+        # Crear barras
+        bars = ax.bar(class_names, probabilities, color=colors, alpha=0.8)
+        
+        # Configurar ejes con traducciones
+        ax.set_ylabel(t('charts.probability_percent'), color='black', fontsize=12)
+        chart_title = title or t('charts.probability_distribution')
+        ax.set_title(chart_title, color='black', fontsize=14, fontweight='bold')
+        ax.set_ylim([0, 100])
+        plt.xticks(rotation=45, ha='right', color='black')
+        ax.tick_params(axis='y', colors='black')
+        
+        # Añadir valores sobre las barras
+        for bar in bars:
+            height = bar.get_height()
+            ax.text(
+                bar.get_x() + bar.get_width()/2.,
+                height + 1,
+                f'{height:.1f}%',
+                ha='center',
+                va='bottom',
+                color='black',
+                fontweight='bold',
+                fontsize=10
+            )
+        
+        # Añadir grid suave para mejor legibilidad
+        ax.grid(True, linestyle='--', alpha=0.3, color='gray')
+        
+        # Ajustar diseño
+        plt.tight_layout()
+        
+        return fig
+    
     def create_comparative_chart(self, predictions: Dict[str, np.ndarray], 
                                title: str = None) -> plt.Figure:
         """
@@ -126,6 +182,65 @@ class ChartGenerator:
         ax.legend(loc='upper right', facecolor=self.config['background_color'], 
                  edgecolor='white', labelcolor='white')
         ax.set_ylim([0, 100])
+        
+        plt.tight_layout()
+        return fig
+    
+    def create_comparative_chart_for_pdf(self, predictions: Dict[str, np.ndarray], 
+                                       title: str = None) -> plt.Figure:
+        """
+        Crear gráfico comparativo de múltiples modelos optimizado para PDF
+        
+        Args:
+            predictions (dict): Predicciones de múltiples modelos
+            title (str): Título del gráfico
+            
+        Returns:
+            plt.Figure: Figura de matplotlib
+        """
+        fig, ax = plt.subplots(figsize=(15, 8))
+        fig.patch.set_facecolor('white')
+        ax.set_facecolor('white')
+        
+        class_names = get_disease_names_translated()
+        model_names = list(predictions.keys())
+        
+        # Configurar posiciones de las barras
+        x = np.arange(len(class_names))
+        width = 0.25
+        
+        # Crear barras para cada modelo
+        for i, (model_name, prediction) in enumerate(predictions.items()):
+            probabilities = prediction[0] * 100
+            model_label = model_name.replace('best_sugarcane_model', t('charts.model_label')).replace('.keras', '')
+            
+            bars = ax.bar(x + i * width, probabilities, width, 
+                         label=model_label, 
+                         color=self.chart_colors[i % len(self.chart_colors)], 
+                         alpha=0.8)
+            
+            # Añadir valores sobre las barras
+            for bar in bars:
+                height = bar.get_height()
+                if height > 5:  # Solo mostrar si la probabilidad es mayor a 5%
+                    ax.text(bar.get_x() + bar.get_width()/2., height + 1,
+                           f'{height:.1f}%', ha='center', va='bottom',
+                           color='black', fontsize=8, fontweight='bold')
+        
+        # Configurar ejes con traducciones
+        ax.set_ylabel(t('charts.probability_percent'), color='black', fontsize=12)
+        ax.set_xlabel(t('charts.disease_classes'), color='black', fontsize=12)
+        chart_title = title or t('charts.model_comparison')
+        ax.set_title(chart_title, color='black', fontsize=16, fontweight='bold')
+        ax.set_xticks(x + width)
+        ax.set_xticklabels(class_names, rotation=45, ha='right', color='black')
+        ax.tick_params(axis='y', colors='black')
+        ax.legend(loc='upper right', facecolor='white', 
+                 edgecolor='black', labelcolor='black')
+        ax.set_ylim([0, 100])
+        
+        # Añadir grid suave para mejor legibilidad
+        ax.grid(True, linestyle='--', alpha=0.3, color='gray')
         
         plt.tight_layout()
         return fig

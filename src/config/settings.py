@@ -122,7 +122,9 @@ I18N_CONFIG = {
     "default_language": "es",
     "supported_languages": {
         "es": {"name": "Español", "flag": "🇪🇸"},
-        "en": {"name": "English", "flag": "🇺🇸"}
+        "en": {"name": "English", "flag": "🇺🇸"},
+        "fr": {"name": "Français", "flag": "🇫🇷"},
+        "pt": {"name": "Português", "flag": "🇧🇷"}
     },
     "translations_dir": "src/translations"
 }

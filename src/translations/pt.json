@@ -1,0 +1,286 @@
+{
+  "app": {
+    "title": "Sistema Especialista de Diagnóstico de Doenças em Cana-de-Açúcar",
+    "loading": "Carregando",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação"
+  },
+  "tabs": {
+    "config": "📤 Configuração",
+    "diagnosis": "🔍 Diagnóstico",
+    "comparison": "📊 Comparar Modelos"
+  },
+  "config": {
+    "title": "Configuração do Modelo",
+    "model_selector": "Selecione o modelo a ser utilizado:",
+    "system_info": "Informação do Sistema",
+    "about_system": "Sobre o Sistema",
+    "system_description": "Este sistema especialista utiliza inteligência artificial para detectar:",
+    "diseases": {
+      "healthy": "Plantas Saudáveis (Healthy)",
+      "mosaic": "Mosaico (Mosaic)",
+      "red_rot": "Podridão Vermelha (Red Rot)",
+      "rust": "Ferrugem (Rust)",
+      "yellow": "Amarelamento (Yellow)"
+    },
+    "model_description": "O modelo foi treinado com milhares de imagens para fornecer diagnósticos precisos e confiáveis.",
+    "upload_model": "Carregar modelo (.keras)",
+    "model_loaded": "Modelo '{model_name}' carregado com sucesso",
+    "model_loading": "Carregando modelo...",
+    "model_selected_loading": "Carregando modelo selecionado...",
+    "model_format_error": "Formato de modelo não suportado",
+    "model_load_warning": "Não foi possível carregar o modelo '{model_name}'",
+    "reportlab_available": "ReportLab disponível: Geração de PDF com suporte UTF-8 completo",
+    "fpdf_available": "FPDF disponível: Geração básica de PDF",
+    "fpdf_recommendation": "Para melhor qualidade de PDF, instale: `pip install reportlab==4.0.4`",
+    "no_pdf_libraries": "Nenhuma biblioteca PDF disponível",
+    "pdf_install_info": "Instale ReportLab ou FPDF para gerar relatórios PDF"
+  },
+  "diagnosis": {
+    "no_model": "Por favor, carregue primeiro o modelo na aba Configuração",
+    "demo_model_info": "Você também pode criar um modelo de demonstração",
+    "create_demo_model": "Criar Modelo de Demonstração",
+    "demo_model_creating": "Criando modelo de demonstração...",
+    "demo_model_success": "Modelo de demonstração criado com sucesso",
+    "demo_model_error": "Erro ao criar modelo: {error}",
+    "upload_image": "Carregar Imagem",
+    "select_image": "Selecionar imagem de folha",
+    "image_loaded": "Imagem carregada: {filename}",
+    "perform_diagnosis": "Realizar Diagnóstico Comparativo",
+    "processing_image": "Processando imagem com múltiplos modelos de IA...",
+    "analysis_complete_multiple": "Análise concluída com {count} modelo(s)",
+    "analysis_complete_single": "Análise concluída com modelo único",
+    "analysis_error": "Não foi possível realizar a análise",
+    "diagnosis_error": "Erro no diagnóstico: {error}",
+    "consensus_diagnosis": "Diagnóstico de Consenso",
+    "diagnosis": "Diagnóstico",
+    "confidence_level": "Nível de confiança:",
+    "details": "Detalhes",
+    "treatment": "Tratamento",
+    "comparison": "Comparação",
+    "analysis": "Análise",
+    "description": "Descrição",
+    "symptoms": "Sintomas",
+    "recommended_treatment": "Tratamento Recomendado",
+    "preventive_measures": "Medidas Preventivas",
+    "consensus_analysis": "Análise de Consenso",
+    "probability_distribution": "Distribuição de Probabilidades",
+    "generate_pdf": "Gerar Relatório PDF",
+    "generate_pdf_comparative": "Gerar Relatório PDF Comparativo",
+    "generating_pdf": "Gerando relatório PDF...",
+    "pdf_generation_error": "Erro ao gerar PDF: {error}",
+    "model_comparison": "Comparação de Modelos",
+    "detailed_results": "Resultados Detalhados por Modelo",
+    "model_agreement": "Estado de Concordância",
+    "model_match": "✅ Coincide",
+    "model_differs": "⚠️ Difere"
+  },
+  "comparison": {
+    "title": "Comparação de Modelos de Diagnóstico",
+    "no_models": "Nenhum modelo encontrado para comparação",
+    "load_models_info": "Carregue modelos na aba Configuração para poder compará-los",
+    "create_examples": "Criar Modelos de Exemplo",
+    "examples_info": "Para criar modelos de exemplo para comparação, você pode:",
+    "use_current_model": "Usar o modelo atual: O modelo carregado na aba Configuração",
+    "create_demo_models": "Criar modelos de demonstração: Executar scripts de treinamento",
+    "load_external_models": "Carregar modelos externos: Fazer upload de arquivos .keras do seu computador",
+    "auto_comparison": "Os modelos serão comparados automaticamente quando estiverem disponíveis.",
+    "models_found": "{count} modelo(s) encontrado(s) para comparação",
+    "models_load_error": "Não foi possível carregar os dados dos modelos",
+    "model_states": {
+      "excellent": "Excelente",
+      "acceptable": "Aceitável",
+      "needs_improvement": "Necessita melhorias",
+      "no_info": "Sem informação"
+    },
+    "metrics": {
+      "model": "Modelo",
+      "accuracy": "Precisão",
+      "loss": "Perda",
+      "f1_score": "Pontuação F1 Média",
+      "size": "Tamanho (MB)",
+      "creation_date": "Data de Criação",
+      "state": "Estado"
+    },
+    "recommendations": "Recomendações",
+    "no_recommendations": "Não há dados suficientes para gerar recomendações",
+    "best_accuracy": "Melhor Precisão",
+    "best_f1": "Melhor Pontuação F1",
+    "smallest": "Menor",
+    "best_model_analysis": "Análise do Melhor Modelo",
+    "main_stats": "Estatísticas Principais",
+    "detailed_report": "Relatório Detalhado",
+    "view_full_report": "Ver relatório completo",
+    "accuracy_metric": "Precisão: {accuracy:.2%}",
+    "loss_metric": "Perda: {loss:.4f}",
+    "model_prefix": "Modelo "
+  },
+  "diseases": {
+    "healthy": {
+      "name": "Saudável (Healthy)",
+      "description": "A planta mostra sinais de boa saúde sem sintomas de doença.",
+      "symptoms": {
+        "0": "Folhas de cor verde intensa e uniforme",
+        "1": "Crescimento vigoroso e uniforme",
+        "2": "Ausência de manchas, lesões ou descolorações",
+        "3": "Caules firmes e bem desenvolvidos",
+        "4": "Estrutura foliar normal"
+      },
+      "treatment": {
+        "0": "Manter o programa regular de fertilização",
+        "1": "Continuar com a irrigação adequada",
+        "2": "Realizar monitoramentos preventivos periódicos",
+        "3": "Manter boas práticas agrícolas"
+      },
+      "prevention": {
+        "0": "Uso de variedades resistentes",
+        "1": "Manter boa drenagem do solo",
+        "2": "Controle de ervas daninhas",
+        "3": "Rotação de culturas quando possível"
+      }
+    },
+    "viral": {
+      "name": "Mosaico (Mosaic)",
+      "description": "Doença viral que causa padrões de mosaico nas folhas, reduzindo a fotossíntese.",
+      "symptoms": {
+        "0": "Padrões de mosaico verde claro e escuro",
+        "1": "Manchas irregulares nas folhas",
+        "2": "Redução do crescimento da planta",
+        "3": "Folhas com aparência manchada",
+        "4": "Clorose internerval"
+      },
+      "treatment": {
+        "0": "Eliminação imediata de plantas infectadas",
+        "1": "Controle de insetos vetores (pulgões)",
+        "2": "Uso de variedades resistentes",
+        "3": "Implementação de barreiras físicas"
+      },
+      "prevention": {
+        "0": "Controle rigoroso de insetos vetores",
+        "1": "Uso de material de plantio certificado",
+        "2": "Desinfecção de ferramentas",
+        "3": "Manejo de ervas daninhas hospedeiras"
+      }
+    },
+    "fungal": {
+      "name": "Podridão Vermelha (Red Rot)",
+      "description": "Doença fúngica causada por Colletotrichum falcatum que afeta severamente o rendimento.",
+      "symptoms": {
+        "0": "Manchas vermelhas nas folhas e caules",
+        "1": "Tecido interno avermelhado nos caules",
+        "2": "Murchamento das folhas",
+        "3": "Perda de vigor da planta",
+        "4": "Lesões necróticas"
+      },
+      "treatment": {
+        "0": "Aplicação de fungicida sistêmico (carbendazim)",
+        "1": "Eliminação imediata de plantas infectadas",
+        "2": "Melhoria da drenagem do solo",
+        "3": "Redução do estresse hídrico"
+      },
+      "prevention": {
+        "0": "Uso de variedades resistentes",
+        "1": "Tratamento de mudas antes do plantio",
+        "2": "Manejo adequado da água",
+        "3": "Controle de insetos vetores"
+      }
+    },
+    "rust": {
+      "name": "Ferrugem (Rust)",
+      "description": "Doença fúngica que forma pústulas de cor ferrugem nas folhas.",
+      "symptoms": {
+        "0": "Pústulas de cor ferrugem na face inferior das folhas",
+        "1": "Manchas amarelas na face superior das folhas",
+        "2": "Desfolhamento precoce",
+        "3": "Redução da área foliar fotossintética",
+        "4": "Clorose generalizada"
+      },
+      "treatment": {
+        "0": "Aplicação de fungicidas protetores",
+        "1": "Melhoria da ventilação da cultura",
+        "2": "Redução da densidade de plantio",
+        "3": "Eliminação de resíduos infectados"
+      },
+      "prevention": {
+        "0": "Uso de variedades resistentes",
+        "1": "Manejo adequado da fertilização",
+        "2": "Controle da umidade relativa",
+        "3": "Monitoramento precoce de sintomas"
+      }
+    },
+    "nutritional": {
+      "name": "Amarelamento (Yellow)",
+      "description": "Condição que pode ser causada por deficiências nutricionais ou estresse ambiental.",
+      "symptoms": {
+        "0": "Amarelamento generalizado das folhas",
+        "1": "Clorose internerval",
+        "2": "Redução do crescimento",
+        "3": "Folhas com aparência pálida",
+        "4": "Sintomas progredindo das folhas velhas"
+      },
+      "treatment": {
+        "0": "Análise do solo para identificar deficiências",
+        "1": "Aplicação de fertilizantes específicos",
+        "2": "Correção do pH do solo",
+        "3": "Melhoria da drenagem se necessário"
+      },
+      "prevention": {
+        "0": "Análise regular do solo",
+        "1": "Programa de fertilização balanceado",
+        "2": "Manejo adequado da irrigação",
+        "3": "Monitoramento do pH do solo"
+      }
+    }
+  },
+  "footer": {
+    "title": "Sistema Especialista de Diagnóstico",
+    "description": "Desenvolvido para a identificação precoce e o manejo eficaz de doenças em cultivos de cana-de-açúcar",
+    "subtitle": "Utilizando inteligência artificial e aprendizado profundo para diagnósticos precisos"
+  },
+  "charts": {
+    "probability_percent": "Probabilidade (%)",
+    "probability_distribution": "Distribuição de Probabilidades",
+    "disease_classes": "Classes de Doença",
+    "model_comparison": "Comparação de Predições por Modelo",
+    "model_label": "Modelo ",
+    "confidence_level": "Nível de Confiança",
+    "probability": "Probabilidade",
+    "average_predictions_distribution": "Distribuição Média de Predições"
+  },
+  "pdf": {
+    "install_libraries": "Instale uma das seguintes bibliotecas:",
+    "recommended": "recomendado",
+    "install_reportlab": "Instalar ReportLab",
+    "install_fpdf": "Instalar FPDF",
+    "installing": "Instalando {package}...",
+    "install_success": "{package} instalado com sucesso",
+    "restart_app": "Reinicie o aplicativo para usar a nova biblioteca",
+    "install_error": "Erro ao instalar {package}: {error}",
+    "comparative_diagnosis_title": "Diagnóstico Comparativo de Cana-de-Açúcar",
+    "diagnosis_title": "Diagnóstico de Cana-de-Açúcar",
+    "multiple_models_analysis": "Análise Multi-Modelos",
+    "models_used": "Modelos utilizados",
+    "models": "modelos",
+    "model_number": "Modelo {number}",
+    "model_used": "Modelo utilizado",
+    "confidence_level": "Nível de confiança",
+    "disease_details": "Detalhes da Doença",
+    "treatment_info": "Informação sobre Tratamento",
+    "prevention_info": "Medidas Preventivas",
+    "technical_info": "Informação Técnica",
+    "date": "Data",
+    "time": "Hora",
+    "page": "Página",
+    "of": "de",
+    "pdf_generated_success": "Relatório PDF gerado com sucesso",
+    "download_report": "Baixar Relatório PDF",
+    "download_help": "Clique para baixar o relatório de diagnóstico em formato PDF",
+    "download_error": "Erro ao baixar o PDF",
+    "cleanup_warning": "Aviso durante a limpeza do arquivo temporário",
+    "generation_failed": "Falha na geração do PDF",
+    "generation_error": "Erro ao gerar o PDF",
+    "report_filename": "relatorio_diagnostico_cana"
+  }
+} 

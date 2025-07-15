@@ -14,7 +14,9 @@ class I18n:
         self.current_language = 'es'
         self.supported_languages = {
             'es': {'name': 'Español', 'flag': '🇪🇸'},
-            'en': {'name': 'English', 'flag': '🇺🇸'}
+            'en': {'name': 'English', 'flag': '🇺🇸'},
+            'fr': {'name': 'Français', 'flag': '🇫🇷'},
+            'pt': {'name': 'Português', 'flag': '🇧🇷'}
         }
         self.load_translations()
     
@@ -95,22 +97,36 @@ class I18n:
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 🌐 Idioma / Language")
         
-        # Usar botones en lugar de selectbox para evitar problemas
-        current_lang = self.get_current_language()
-        
+        # Crear dos filas de botones para los idiomas
         col1, col2 = st.sidebar.columns(2)
         
+        # Primera fila: Español e Inglés
         with col1:
             if st.button("🇪🇸 Español", 
                         use_container_width=True, 
-                        type="primary" if current_lang == "es" else "secondary"):
+                        type="primary" if self.get_current_language() == "es" else "secondary"):
                 self.set_language("es")
         
         with col2:
             if st.button("🇺🇸 English", 
                         use_container_width=True, 
-                        type="primary" if current_lang == "en" else "secondary"):
+                        type="primary" if self.get_current_language() == "en" else "secondary"):
                 self.set_language("en")
+        
+        # Segunda fila: Francés y Portugués
+        col3, col4 = st.sidebar.columns(2)
+        
+        with col3:
+            if st.button("🇫🇷 Français", 
+                        use_container_width=True, 
+                        type="primary" if self.get_current_language() == "fr" else "secondary"):
+                self.set_language("fr")
+        
+        with col4:
+            if st.button("🇧🇷 Português", 
+                        use_container_width=True, 
+                        type="primary" if self.get_current_language() == "pt" else "secondary"):
+                self.set_language("pt")
 
 # Instancia global
 i18n = I18n()

@@ -2,7 +2,7 @@
 
 ## 🌐 Descripción
 
-Se ha implementado un sistema multilenguaje completo para la aplicación de diagnóstico de enfermedades en caña de azúcar. El sistema soporta **español** e **inglés** y permite cambiar el idioma de la interfaz dinámicamente.
+Se ha implementado un sistema multilenguaje completo para la aplicación de diagnóstico de enfermedades en caña de azúcar. El sistema soporta **español**, **inglés**, **francés** y **portugués** y permite cambiar el idioma de la interfaz dinámicamente.
 
 ## 📁 Estructura del Sistema
 
@@ -10,7 +10,9 @@ Se ha implementado un sistema multilenguaje completo para la aplicación de diag
 src/
 ├── translations/           # Archivos de traducciones
 │   ├── es.json            # Traducciones en español
-│   └── en.json            # Traducciones en inglés
+│   ├── en.json            # Traducciones en inglés
+│   ├── fr.json            # Traducciones en francés
+│   └── pt.json            # Traducciones en portugués
 ├── utils/
 │   └── i18n.py           # Sistema de internacionalización
 ├── config/
@@ -26,6 +28,8 @@ src/
 ### ✅ Idiomas Soportados
 - **Español (es)** - Idioma por defecto
 - **English (en)** - Idioma secundario
+- **Français (fr)** - Idioma terciario
+- **Português (pt)** - Idioma cuaternario
 
 ### ✅ Elementos Traducidos
 - **Interfaz principal**: Títulos, botones, etiquetas

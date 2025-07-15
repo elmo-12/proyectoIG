@@ -17,6 +17,7 @@ from ..reports.pdf_generator import PDFReportGenerator
 from ..ui.styles import apply_custom_styles, create_diagnosis_box, create_info_card, create_metric_container
 from ..data.diseases import get_disease_info, get_disease_info_translated
 from ..utils.i18n import t, i18n
+import plotly.graph_objects as go
 
 class UIComponents:
     """Componentes de interfaz de usuario"""
@@ -321,7 +322,7 @@ class UIComponents:
     def _render_details_tab(self, disease_info: Dict):
         """Renderizar pestaña de detalles"""
         st.markdown(f"### 📋 {t('diagnosis.description')}")
-        st.markdown(create_info_card(t('diagnosis.description'), disease_info['description']), unsafe_allow_html=True)
+        st.markdown(create_info_card(disease_info['description'], 'info'), unsafe_allow_html=True)
         
         st.markdown(f"### 🔍 {t('diagnosis.symptoms')}")
         for symptom in disease_info['symptoms']:
@@ -376,13 +377,98 @@ class UIComponents:
 
     def _render_analysis_tab(self, results: Dict):
         """Renderizar pestaña de análisis"""
-        if 'all_predictions' in results:
-            st.markdown(f"#### {t('diagnosis.consensus_analysis')}")
-            
-            # Gráfico de distribución de probabilidades
-            st.markdown(f"##### {t('diagnosis.probability_distribution')}")
-            chart = self.chart_generator.create_probability_chart(results['prediction'])
-            st.plotly_chart(chart, use_container_width=True)
+        st.markdown(f"### 📈 {t('diagnosis.analysis')}")
+        
+        # Obtener predicciones y nombres de enfermedades
+        probs = results['consensus_prediction'][0] if results.get('consensus_prediction') is not None else results['prediction'][0]
+        diseases = [get_disease_info_translated(idx) for idx in range(len(probs))]
+        
+        # Crear DataFrame para el gráfico
+        df = pd.DataFrame({
+            'Enfermedad': [d['name'] for d in diseases],
+            'Probabilidad': probs * 100,
+            'Color': [d['color'] for d in diseases]
+        })
+        
+        # Crear gráfico de barras con Plotly
+        fig = go.Figure(data=[
+            go.Bar(
+                x=df['Enfermedad'],
+                y=df['Probabilidad'],
+                marker_color=df['Color'],
+                text=df['Probabilidad'].apply(lambda x: f'{x:.1f}%'),
+                textposition='auto',
+            )
+        ])
+        
+        # Configurar layout del gráfico
+        fig.update_layout(
+            title=t('diagnosis.probability_distribution'),
+            xaxis_title=t('diagnosis.disease'),
+            yaxis_title=t('diagnosis.probability'),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
+            showlegend=False,
+            yaxis=dict(
+                range=[0, 100],
+                gridcolor='rgba(128,128,128,0.2)',
+                zerolinecolor='rgba(128,128,128,0.2)'
+            ),
+            xaxis=dict(
+                tickangle=45,
+                gridcolor='rgba(128,128,128,0.2)',
+                zerolinecolor='rgba(128,128,128,0.2)'
+            ),
+            margin=dict(t=50, b=100)
+        )
+        
+        # Mostrar gráfico
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Matriz de confusión si está disponible
+        if st.session_state.selected_model_file:
+            confusion_matrix_path = self.model_manager.get_confusion_matrix_path(st.session_state.selected_model_file)
+            if confusion_matrix_path and os.path.exists(confusion_matrix_path):
+                st.markdown(f"#### 📊 {t('diagnosis.confusion_matrix')}")
+                st.image(confusion_matrix_path, use_column_width=True)
+        
+        # Información estadística del modelo
+        if st.session_state.selected_model_file:
+            model_info = self.model_manager.load_model_info(st.session_state.selected_model_file)
+            if model_info:
+                st.markdown(f"#### 📋 {t('diagnosis.model_statistics')}")
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric(t('diagnosis.accuracy'), f"{model_info['test_accuracy']:.2%}")
+                with col2:
+                    st.metric(t('diagnosis.loss'), f"{model_info['test_loss']:.4f}")
+                
+                with st.expander(t('diagnosis.view_full_report')):
+                    st.text(model_info['full_report'])
+        
+        # Análisis detallado de probabilidades
+        st.markdown(f"#### 🔍 {t('diagnosis.detailed_analysis')}")
+        for idx, (prob, info) in enumerate(zip(probs, diseases)):
+            prob_percentage = prob * 100
+            color = info['color']
+            st.markdown(
+                f"""
+                <div style='
+                    background-color: rgba(37, 37, 37, 0.8);
+                    margin: 0.5rem 0;
+                    padding: 0.75rem;
+                    border-radius: 5px;
+                    border-left: 4px solid {color};
+                    color: #E0E0E0;
+                '>
+                    <span style='font-size: 1.1em; font-weight: bold;'>{info['name']}</span>
+                    <br/>
+                    {t('diagnosis.probability')}: <span style='color: {color}; font-weight: bold;'>{prob_percentage:.1f}%</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     def _render_pdf_button(self, results: Dict):
         """Renderizar botón de generación de PDF"""
@@ -418,7 +504,7 @@ class UIComponents:
                         st.download_button(
                             label=f"📥 {t('pdf.download_report')}",
                             data=pdf_bytes,
-                            file_name="diagnosis_report.pdf",
+                            file_name=f"{t('pdf.report_filename')}.pdf",
                             mime="application/pdf",
                             help=t('pdf.download_help'),
                             use_container_width=True

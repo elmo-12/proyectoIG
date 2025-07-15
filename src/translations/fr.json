@@ -1,0 +1,286 @@
+{
+  "app": {
+    "title": "Système Expert de Diagnostic des Maladies de la Canne à Sucre",
+    "loading": "Chargement",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "info": "Information"
+  },
+  "tabs": {
+    "config": "📤 Configuration",
+    "diagnosis": "🔍 Diagnostic",
+    "comparison": "📊 Comparer les Modèles"
+  },
+  "config": {
+    "title": "Configuration du Modèle",
+    "model_selector": "Sélectionnez le modèle à utiliser :",
+    "system_info": "Information du Système",
+    "about_system": "À propos du Système",
+    "system_description": "Ce système expert utilise l'intelligence artificielle pour détecter :",
+    "diseases": {
+      "healthy": "Plantes Saines (Healthy)",
+      "mosaic": "Mosaïque (Mosaic)",
+      "red_rot": "Pourriture Rouge (Red Rot)",
+      "rust": "Rouille (Rust)",
+      "yellow": "Jaunissement (Yellow)"
+    },
+    "model_description": "Le modèle a été entraîné avec des milliers d'images pour fournir des diagnostics précis et fiables.",
+    "upload_model": "Charger le modèle (.keras)",
+    "model_loaded": "Modèle '{model_name}' chargé avec succès",
+    "model_loading": "Chargement du modèle...",
+    "model_selected_loading": "Chargement du modèle sélectionné...",
+    "model_format_error": "Format de modèle non supporté",
+    "model_load_warning": "Impossible de charger le modèle '{model_name}'",
+    "reportlab_available": "ReportLab disponible : Génération PDF avec support UTF-8 complet",
+    "fpdf_available": "FPDF disponible : Génération PDF basique",
+    "fpdf_recommendation": "Pour une meilleure qualité PDF, installez : `pip install reportlab==4.0.4`",
+    "no_pdf_libraries": "Aucune bibliothèque PDF disponible",
+    "pdf_install_info": "Installez ReportLab ou FPDF pour générer des rapports PDF"
+  },
+  "diagnosis": {
+    "no_model": "Veuillez d'abord charger le modèle dans l'onglet Configuration",
+    "demo_model_info": "Vous pouvez également créer un modèle de démonstration",
+    "create_demo_model": "Créer un Modèle de Démonstration",
+    "demo_model_creating": "Création du modèle de démonstration...",
+    "demo_model_success": "Modèle de démonstration créé avec succès",
+    "demo_model_error": "Erreur lors de la création du modèle : {error}",
+    "upload_image": "Charger une Image",
+    "select_image": "Sélectionner une image de feuille",
+    "image_loaded": "Image chargée : {filename}",
+    "perform_diagnosis": "Effectuer un Diagnostic Comparatif",
+    "processing_image": "Traitement de l'image avec plusieurs modèles d'IA...",
+    "analysis_complete_multiple": "Analyse terminée avec {count} modèle(s)",
+    "analysis_complete_single": "Analyse terminée avec un seul modèle",
+    "analysis_error": "Impossible d'effectuer l'analyse",
+    "diagnosis_error": "Erreur de diagnostic : {error}",
+    "consensus_diagnosis": "Diagnostic de Consensus",
+    "diagnosis": "Diagnostic",
+    "confidence_level": "Niveau de confiance :",
+    "details": "Détails",
+    "treatment": "Traitement",
+    "comparison": "Comparaison",
+    "analysis": "Analyse",
+    "description": "Description",
+    "symptoms": "Symptômes",
+    "recommended_treatment": "Traitement Recommandé",
+    "preventive_measures": "Mesures Préventives",
+    "consensus_analysis": "Analyse du Consensus",
+    "probability_distribution": "Distribution des Probabilités",
+    "generate_pdf": "Générer un Rapport PDF",
+    "generate_pdf_comparative": "Générer un Rapport PDF Comparatif",
+    "generating_pdf": "Génération du rapport PDF...",
+    "pdf_generation_error": "Erreur lors de la génération du PDF : {error}",
+    "model_comparison": "Comparaison des Modèles",
+    "detailed_results": "Résultats Détaillés par Modèle",
+    "model_agreement": "État de Concordance",
+    "model_match": "✅ Correspond",
+    "model_differs": "⚠️ Diffère"
+  },
+  "comparison": {
+    "title": "Comparaison des Modèles de Diagnostic",
+    "no_models": "Aucun modèle trouvé pour la comparaison",
+    "load_models_info": "Chargez des modèles dans l'onglet Configuration pour pouvoir les comparer",
+    "create_examples": "Créer des Modèles d'Exemple",
+    "examples_info": "Pour créer des modèles d'exemple pour la comparaison, vous pouvez :",
+    "use_current_model": "Utiliser le modèle actuel : Le modèle chargé dans l'onglet Configuration",
+    "create_demo_models": "Créer des modèles de démonstration : Exécuter des scripts d'entraînement",
+    "load_external_models": "Charger des modèles externes : Télécharger des fichiers .keras depuis votre ordinateur",
+    "auto_comparison": "Les modèles seront comparés automatiquement lorsqu'ils seront disponibles.",
+    "models_found": "{count} modèle(s) trouvé(s) pour la comparaison",
+    "models_load_error": "Impossible de charger les données des modèles",
+    "model_states": {
+      "excellent": "Excellent",
+      "acceptable": "Acceptable",
+      "needs_improvement": "Nécessite des améliorations",
+      "no_info": "Pas d'information"
+    },
+    "metrics": {
+      "model": "Modèle",
+      "accuracy": "Précision",
+      "loss": "Perte",
+      "f1_score": "Score F1 Moyen",
+      "size": "Taille (MB)",
+      "creation_date": "Date de Création",
+      "state": "État"
+    },
+    "recommendations": "Recommandations",
+    "no_recommendations": "Pas assez de données pour générer des recommandations",
+    "best_accuracy": "Meilleure Précision",
+    "best_f1": "Meilleur Score F1",
+    "smallest": "Plus Petit",
+    "best_model_analysis": "Analyse du Meilleur Modèle",
+    "main_stats": "Statistiques Principales",
+    "detailed_report": "Rapport Détaillé",
+    "view_full_report": "Voir le rapport complet",
+    "accuracy_metric": "Précision : {accuracy:.2%}",
+    "loss_metric": "Perte : {loss:.4f}",
+    "model_prefix": "Modèle "
+  },
+  "diseases": {
+    "healthy": {
+      "name": "Saine (Healthy)",
+      "description": "La plante montre des signes de bonne santé sans symptômes de maladie.",
+      "symptoms": {
+        "0": "Feuilles de couleur vert intense et uniforme",
+        "1": "Croissance vigoureuse et uniforme",
+        "2": "Absence de taches, lésions ou décolorations",
+        "3": "Tiges fermes et bien développées",
+        "4": "Structure foliaire normale"
+      },
+      "treatment": {
+        "0": "Maintenir le programme régulier de fertilisation",
+        "1": "Continuer avec l'irrigation appropriée",
+        "2": "Effectuer des contrôles préventifs périodiques",
+        "3": "Maintenir de bonnes pratiques agricoles"
+      },
+      "prevention": {
+        "0": "Utilisation de variétés résistantes",
+        "1": "Maintenir un bon drainage du sol",
+        "2": "Contrôle des mauvaises herbes",
+        "3": "Rotation des cultures si possible"
+      }
+    },
+    "viral": {
+      "name": "Mosaïque (Mosaic)",
+      "description": "Maladie virale causant des motifs en mosaïque sur les feuilles, réduisant la photosynthèse.",
+      "symptoms": {
+        "0": "Motifs en mosaïque vert clair et foncé",
+        "1": "Taches irrégulières sur les feuilles",
+        "2": "Réduction de la croissance de la plante",
+        "3": "Feuilles d'apparence tachetée",
+        "4": "Chlorose internervaire"
+      },
+      "treatment": {
+        "0": "Élimination immédiate des plantes infectées",
+        "1": "Contrôle des insectes vecteurs (pucerons)",
+        "2": "Utilisation de variétés résistantes",
+        "3": "Mise en place de barrières physiques"
+      },
+      "prevention": {
+        "0": "Contrôle strict des insectes vecteurs",
+        "1": "Utilisation de matériel de plantation certifié",
+        "2": "Désinfection des outils",
+        "3": "Gestion des mauvaises herbes hôtes"
+      }
+    },
+    "fungal": {
+      "name": "Pourriture Rouge (Red Rot)",
+      "description": "Maladie fongique causée par Colletotrichum falcatum qui affecte sévèrement le rendement.",
+      "symptoms": {
+        "0": "Taches rouges sur les feuilles et les tiges",
+        "1": "Tissu interne rougeâtre dans les tiges",
+        "2": "Flétrissement des feuilles",
+        "3": "Perte de vigueur de la plante",
+        "4": "Lésions nécrotiques"
+      },
+      "treatment": {
+        "0": "Application de fongicide systémique (carbendazime)",
+        "1": "Élimination immédiate des plantes infectées",
+        "2": "Amélioration du drainage du sol",
+        "3": "Réduction du stress hydrique"
+      },
+      "prevention": {
+        "0": "Utilisation de variétés résistantes",
+        "1": "Traitement des boutures avant la plantation",
+        "2": "Gestion appropriée de l'eau",
+        "3": "Contrôle des insectes vecteurs"
+      }
+    },
+    "rust": {
+      "name": "Rouille (Rust)",
+      "description": "Maladie fongique qui forme des pustules couleur rouille sur les feuilles.",
+      "symptoms": {
+        "0": "Pustules couleur rouille sur la face inférieure des feuilles",
+        "1": "Taches jaunes sur la face supérieure des feuilles",
+        "2": "Défoliation précoce",
+        "3": "Réduction de la surface foliaire photosynthétique",
+        "4": "Chlorose généralisée"
+      },
+      "treatment": {
+        "0": "Application de fongicides protecteurs",
+        "1": "Amélioration de la ventilation de la culture",
+        "2": "Réduction de la densité de plantation",
+        "3": "Élimination des résidus infectés"
+      },
+      "prevention": {
+        "0": "Utilisation de variétés résistantes",
+        "1": "Gestion appropriée de la fertilisation",
+        "2": "Contrôle de l'humidité relative",
+        "3": "Surveillance précoce des symptômes"
+      }
+    },
+    "nutritional": {
+      "name": "Jaunissement (Yellow)",
+      "description": "Condition pouvant être causée par des carences nutritionnelles ou un stress environnemental.",
+      "symptoms": {
+        "0": "Jaunissement généralisé des feuilles",
+        "1": "Chlorose internervaire",
+        "2": "Réduction de la croissance",
+        "3": "Feuilles d'apparence pâle",
+        "4": "Symptômes progressant depuis les vieilles feuilles"
+      },
+      "treatment": {
+        "0": "Analyse du sol pour identifier les carences",
+        "1": "Application d'engrais spécifiques",
+        "2": "Correction du pH du sol",
+        "3": "Amélioration du drainage si nécessaire"
+      },
+      "prevention": {
+        "0": "Analyse régulière du sol",
+        "1": "Programme de fertilisation équilibré",
+        "2": "Gestion appropriée de l'irrigation",
+        "3": "Surveillance du pH du sol"
+      }
+    }
+  },
+  "footer": {
+    "title": "Système Expert de Diagnostic",
+    "description": "Développé pour l'identification précoce et la gestion efficace des maladies dans les cultures de canne à sucre",
+    "subtitle": "Utilisant l'intelligence artificielle et l'apprentissage profond pour des diagnostics précis"
+  },
+  "charts": {
+    "probability_percent": "Probabilité (%)",
+    "probability_distribution": "Distribution des Probabilités",
+    "disease_classes": "Classes de Maladie",
+    "model_comparison": "Comparaison des Prédictions par Modèle",
+    "model_label": "Modèle ",
+    "confidence_level": "Niveau de Confiance",
+    "probability": "Probabilité",
+    "average_predictions_distribution": "Distribution Moyenne des Prédictions"
+  },
+  "pdf": {
+    "install_libraries": "Installez l'une des bibliothèques suivantes :",
+    "recommended": "recommandé",
+    "install_reportlab": "Installer ReportLab",
+    "install_fpdf": "Installer FPDF",
+    "installing": "Installation de {package}...",
+    "install_success": "{package} installé avec succès",
+    "restart_app": "Redémarrez l'application pour utiliser la nouvelle bibliothèque",
+    "install_error": "Erreur lors de l'installation de {package} : {error}",
+    "comparative_diagnosis_title": "Diagnostic Comparatif de la Canne à Sucre",
+    "diagnosis_title": "Diagnostic de la Canne à Sucre",
+    "multiple_models_analysis": "Analyse Multi-Modèles",
+    "models_used": "Modèles utilisés",
+    "models": "modèles",
+    "model_number": "Modèle {number}",
+    "model_used": "Modèle utilisé",
+    "confidence_level": "Niveau de confiance",
+    "disease_details": "Détails de la Maladie",
+    "treatment_info": "Information sur le Traitement",
+    "prevention_info": "Mesures Préventives",
+    "technical_info": "Information Technique",
+    "date": "Date",
+    "time": "Heure",
+    "page": "Page",
+    "of": "de",
+    "pdf_generated_success": "Rapport PDF généré avec succès",
+    "download_report": "Télécharger le Rapport PDF",
+    "download_help": "Cliquez pour télécharger le rapport de diagnostic au format PDF",
+    "download_error": "Erreur lors du téléchargement du PDF",
+    "cleanup_warning": "Avertissement lors du nettoyage du fichier temporaire",
+    "generation_failed": "Échec de la génération du PDF",
+    "generation_error": "Erreur lors de la génération du PDF",
+    "report_filename": "rapport_diagnostic_canne"
+  }
+} 

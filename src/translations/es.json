@@ -325,6 +325,9 @@
     "visual_analysis": "Análisis Visual",
     "probability_distribution": "Distribución de Probabilidades",
     "probability_distribution_consensus": "Distribución de Probabilidades (Consenso)",
+    "model_comparison": "Comparación entre Modelos",
+    "model_metrics": "Métricas del Modelo",
+    "classification_report": "Reporte de Clasificación",
     "technical_info": "Información Técnica",
     "loss": "Pérdida",
     "confusion_matrix": "Matriz de Confusión",
@@ -365,5 +368,24 @@
       "accuracy_by_model": "Precisión por Modelo",
       "f1_by_model": "F1-Score por Modelo"
     }
+  },
+  "analysis": {
+    "analysis": "Análisis",
+    "probability_distribution": "Distribución de Probabilidades",
+    "confusion_matrix": "Matriz de Confusión",
+    "model_statistics": "Estadísticas del Modelo",
+    "accuracy": "Precisión",
+    "loss": "Pérdida",
+    "view_full_report": "Ver reporte completo",
+    "detailed_analysis": "Análisis Detallado",
+    "probability": "Probabilidad",
+    "disease": "Enfermedad",
+    "probability": "Probabilidad",
+    "confusion_matrix": "Matriz de Confusión",
+    "model_statistics": "Estadísticas del Modelo",
+    "accuracy": "Precisión",
+    "loss": "Pérdida",
+    "view_full_report": "Ver reporte completo",
+    "detailed_analysis": "Análisis Detallado"
   }
 } 

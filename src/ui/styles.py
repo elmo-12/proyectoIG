@@ -272,21 +272,20 @@ def create_diagnosis_box(content: str, box_type: str = "healthy") -> str:
     </div>
     """
 
-def create_info_card(title: str, content: str) -> str:
+def create_info_card(content: str, card_type: str = "info") -> str:
     """
-    Crear tarjeta de información
+    Crear tarjeta de información con estilos
     
     Args:
-        title (str): Título de la tarjeta
         content (str): Contenido de la tarjeta
+        card_type (str): Tipo de tarjeta ('info', 'warning', 'error')
         
     Returns:
-        str: HTML de la tarjeta
+        str: HTML con estilos aplicados
     """
     return f"""
-    <div class='info-card slide-up'>
-        <h3>{title}</h3>
-        <div>{content}</div>
+    <div class='info-card {card_type}'>
+        <p style='margin: 0; font-size: 1.1em;'>{content}</p>
     </div>
     """
 
