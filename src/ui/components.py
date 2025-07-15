@@ -226,34 +226,34 @@ class UIComponents:
         
         # Tab de cámara
         with camera_tab:
-            # Botón para activar la cámara
-            if st.button("📸 " + t('diagnosis.activate_camera'), use_container_width=True, key="camera_button"):
-                # Usar componente HTML personalizado para acceder a la cámara
-                camera_html = '''
-                <input type="file" accept="image/*" capture="camera" id="cameraInput" style="display: none;">
-                <script>
-                    // Simular clic en el input cuando se carga
-                    document.getElementById("cameraInput").click();
-                    
-                    // Manejar la captura de imagen
-                    document.getElementById("cameraInput").onchange = function(e) {
-                        var file = e.target.files[0];
-                        if (file) {
-                            var formData = new FormData();
-                            formData.append("file", file);
-                            // Enviar la imagen al servidor
-                            fetch("/_stcore/upload", {
-                                method: "POST",
-                                body: formData
-                            });
-                        }
-                    }
-                </script>
-                '''
-                st.components.v1.html(camera_html, height=0)
+            # Inicializar estados si no existen
+            if 'show_camera' not in st.session_state:
+                st.session_state.show_camera = False
+            if 'captured_image' not in st.session_state:
+                st.session_state.captured_image = None
+            
+            # Botón para activar/desactivar la cámara
+            if not st.session_state.show_camera:
+                if st.button("📸 " + t('diagnosis.activate_camera')):
+                    st.session_state.show_camera = True
+                    st.experimental_rerun()
+            else:
+                if st.button("❌ " + t('diagnosis.deactivate_camera')):
+                    st.session_state.show_camera = False
+                    st.experimental_rerun()
                 
-            # Mostrar mensaje de ayuda
-            st.markdown("ℹ️ " + t('diagnosis.camera_help'))
+                # Mostrar la cámara solo cuando está activada
+                camera_image = st.camera_input(t('diagnosis.camera_instructions'))
+                if camera_image is not None:
+                    # Guardar la imagen capturada en el estado
+                    st.session_state.captured_image = camera_image
+                    st.session_state.show_camera = False
+                    st.experimental_rerun()
+            
+            # Procesar la imagen capturada si existe
+            if st.session_state.captured_image is not None:
+                image = Image.open(st.session_state.captured_image)
+                self._process_uploaded_image(image, "camera_capture.jpg")
     
     def _process_uploaded_image(self, image: Image.Image, filename: str):
         """Procesar imagen subida o capturada"""

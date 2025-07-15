@@ -51,6 +51,7 @@
     "drag_drop_image": "Arrastra y suelta tu imagen aquí",
     "file_help": "Formatos soportados: JPG, JPEG, PNG. Tamaño máximo: 500MB",
     "activate_camera": "Activar cámara",
+    "deactivate_camera": "Desactivar cámara",
     "camera_instructions": "Toma una foto de la hoja",
     "image_loaded": "Imagen cargada: {filename}",
     "perform_diagnosis": "Realizar Diagnóstico Comparativo",
