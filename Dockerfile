@@ -44,4 +44,4 @@ RUN chmod -R 777 /app
 EXPOSE 8123
 
 # Comando para ejecutar la app
-CMD ["streamlit", "run", "app.py", "--server.maxUploadSize=500", "--server.port=8123", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "main_app.py", "--server.maxUploadSize=500", "--server.port=8123", "--server.address=0.0.0.0"]

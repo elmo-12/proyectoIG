@@ -1123,7 +1123,7 @@ def generate_pdf_reportlab(image,
         # Generar PDF
         doc.build(story)
         
-        # Limpiar archivos temporales
+        # Limpiar archivos temporales después de generar el PDF
         try:
             os.unlink(tmp_img_path)
             os.unlink(chart_path)
