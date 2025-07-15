@@ -188,9 +188,9 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ### Equipo de Desarrollo
 - **Elmo Tirado Ruiz** - Líder del Proyecto - [@elmo-12](https://github.com/elmo-12)
-- **Kevin Rivas Verastegui** - Desarrollador ML/IA
-- **Fatima Avila Juarez** - Desarrolladora Backend
-- **Pamela Alayo Gamboa** - Desarrolladora Frontend
+- **Kevin Rivas Verastegui** - Desarrollador ML/IA - [@KeviinASD](https://github.com/KeviinASD)
+- **Fatima Avila Juarez** - Desarrolladora Backend - [@avilank](https://github.com/avilank)
+- **Pamela Alayo Gamboa** - Desarrolladora Frontend - [@Pamela1616](https://github.com/Pamela1616)
 
 ### Contacto
 Para consultas y soporte, puedes contactar al equipo a través de:
