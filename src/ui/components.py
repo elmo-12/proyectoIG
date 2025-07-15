@@ -190,21 +190,43 @@ class UIComponents:
     def _render_image_upload(self):
         """Renderizar sección de carga de imagen"""
         st.markdown(f"### {t('diagnosis.upload_image')}")
-        image_file = st.file_uploader(t('diagnosis.select_image'), type=['jpg', 'jpeg', 'png'])
         
-        if image_file is not None:
-            image = Image.open(image_file)
+        # Crear tabs para los diferentes métodos de entrada
+        upload_tab, camera_tab = st.tabs([t('diagnosis.select_image'), t('diagnosis.take_photo')])
+        
+        # Tab de carga de archivo
+        with upload_tab:
+            image_file = st.file_uploader(
+                t('diagnosis.drag_drop_image'), 
+                type=['jpg', 'jpeg', 'png'],
+                help=t('diagnosis.file_help')
+            )
             
-            # Validar imagen
-            if self.image_processor.validate_image(image):
-                # Mostrar imagen con estilo
-                st.markdown("<div class='image-container'>", unsafe_allow_html=True)
-                st.image(image, caption=t('diagnosis.image_loaded', filename=image_file.name), use_column_width=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+            if image_file is not None:
+                image = Image.open(image_file)
+                self._process_uploaded_image(image, image_file.name)
+        
+        # Tab de cámara
+        with camera_tab:
+            if st.button(t('diagnosis.activate_camera'), use_container_width=True):
+                camera_image = st.camera_input(t('diagnosis.camera_instructions'))
                 
-                # Botón de diagnóstico
-                if st.button(f"🔍 {t('diagnosis.perform_diagnosis')}", use_container_width=True):
-                    self._perform_diagnosis(image)
+                if camera_image is not None:
+                    image = Image.open(camera_image)
+                    self._process_uploaded_image(image, "camera_capture.jpg")
+    
+    def _process_uploaded_image(self, image: Image.Image, filename: str):
+        """Procesar imagen subida o capturada"""
+        # Validar imagen
+        if self.image_processor.validate_image(image):
+            # Mostrar imagen con estilo
+            st.markdown("<div class='image-container'>", unsafe_allow_html=True)
+            st.image(image, caption=t('diagnosis.image_loaded', filename=filename), use_column_width=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+            # Botón de diagnóstico
+            if st.button(f"🔍 {t('diagnosis.perform_diagnosis')}", use_container_width=True):
+                self._perform_diagnosis(image)
     
     def _perform_diagnosis(self, image: Image.Image):
         """Realizar diagnóstico de la imagen"""
