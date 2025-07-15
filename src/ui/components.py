@@ -129,13 +129,31 @@ class UIComponents:
         if not st.session_state.model_loaded and st.session_state.selected_model_file:
             model_path = f"models/{st.session_state.selected_model_file}"
             with st.spinner(f"⏳ {t('config.model_selected_loading')}"):
-                model = self.model_manager.load_model(model_path)
-                if model is not None:
+                model, error = self.model_manager.load_model(model_path)
+                
+                if error is None and model is not None:
                     st.session_state.model = model
                     st.session_state.model_loaded = True
                     st.success(f"✅ {t('config.model_loaded', model_name=st.session_state.selected_model_file)}")
                 else:
-                    st.warning(f"⚠️ {t('config.model_load_warning', model_name=st.session_state.selected_model_file)}")
+                    if error["type"] == "compatibility":
+                        st.error("❌ Error de compatibilidad detectado")
+                        st.info("💡 Este error indica un problema de compatibilidad entre versiones de TensorFlow/Keras")
+                        st.info("🔧 Soluciones disponibles:")
+                        st.info("   1. Ejecutar el script de compatibilidad")
+                        st.info("   2. Usar la versión simple de la aplicación")
+                        
+                        if st.button("🔧 Solucionar Compatibilidad Automáticamente"):
+                            success, message = self.model_manager.fix_compatibility()
+                            if success:
+                                st.success(f"✅ {message}")
+                                st.experimental_rerun()
+                            else:
+                                st.error(f"❌ {message}")
+                    elif error["type"] == "not_found":
+                        st.error(f"❌ Modelo no encontrado: {model_path}")
+                    else:
+                        st.error(f"❌ Error al cargar el modelo: {error['message']}")
     
     def render_diagnosis_tab(self):
         """Renderizar pestaña de diagnóstico"""

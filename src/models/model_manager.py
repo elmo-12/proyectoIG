@@ -5,7 +5,7 @@ import os
 import warnings
 import tensorflow as tf
 import streamlit as st
-from typing import Dict, Optional, List, Any
+from typing import Dict, Optional, List, Any, Tuple
 import numpy as np
 
 from ..config.settings import (
@@ -21,6 +21,7 @@ class ModelManager:
     def __init__(self):
         self._configure_tensorflow()
         self._models_cache = {}
+        self.last_error = None
         
     def _configure_tensorflow(self):
         """Configurar TensorFlow para evitar warnings"""
@@ -46,7 +47,7 @@ class ModelManager:
                     warnings.filterwarnings('ignore', module=filter_config['module'])
     
     @st.cache_resource
-    def load_model(_self, model_path: str) -> Optional[tf.keras.Model]:
+    def load_model(_self, model_path: str) -> Tuple[Optional[tf.keras.Model], Optional[Dict]]:
         """
         Cargar modelo de TensorFlow/Keras con manejo de compatibilidad
         
@@ -54,11 +55,11 @@ class ModelManager:
             model_path (str): Ruta al archivo del modelo
             
         Returns:
-            tf.keras.Model: Modelo cargado o None si hay error
+            Tuple[Optional[tf.keras.Model], Optional[Dict]]: Modelo cargado y diccionario de error si existe
         """
         try:
             if not os.path.exists(model_path):
-                return None
+                return None, {"type": "not_found", "message": "Modelo no encontrado"}
                 
             # Cargar modelo sin compilar para evitar problemas de optimizador
             model = tf.keras.models.load_model(model_path, compile=False)
@@ -66,46 +67,37 @@ class ModelManager:
             # Recompilar con configuración estándar
             model.compile(**MODEL_CONFIG['compile_config'])
             
-            return model
+            return model, None
             
         except Exception as e:
-            _self._handle_model_error(e, model_path)
-            return None
+            error_msg = str(e)
+            error_info = {
+                "type": "compatibility" if "keras.src.models.functional" in error_msg or "cannot be imported" in error_msg else "unknown",
+                "message": error_msg,
+                "model_path": model_path
+            }
+            return None, error_info
     
-    def _handle_model_error(self, error: Exception, model_path: str):
-        """Manejar errores de carga de modelo"""
-        error_msg = str(error)
+    def fix_compatibility(self) -> Tuple[bool, str]:
+        """
+        Intentar solucionar problemas de compatibilidad
         
-        if "keras.src.models.functional" in error_msg or "cannot be imported" in error_msg:
-            st.error("❌ Error de compatibilidad detectado")
-            st.info("💡 Este error indica un problema de compatibilidad entre versiones de TensorFlow/Keras")
-            st.info("🔧 Soluciones:")
-            st.info("   1. Ejecutar: python fix_model_compatibility.py")
-            st.info("   2. O usar la versión simple: streamlit run app_simple.py")
-            
-            if st.button("🔧 Solucionar Compatibilidad Automáticamente"):
-                self._fix_compatibility()
-        else:
-            st.error(f"❌ Error al cargar modelo: {error_msg}")
-    
-    def _fix_compatibility(self):
-        """Intentar solucionar problemas de compatibilidad"""
-        with st.spinner("Solucionando problema de compatibilidad..."):
-            try:
-                import subprocess
-                import sys
-                result = subprocess.run(
-                    [sys.executable, "fix_model_compatibility.py"], 
-                    capture_output=True, 
-                    text=True
-                )
-                if result.returncode == 0:
-                    st.success("✅ Problema de compatibilidad solucionado")
-                    st.experimental_rerun()
-                else:
-                    st.error(f"❌ Error: {result.stderr}")
-            except Exception as fix_error:
-                st.error(f"❌ Error ejecutando solución: {fix_error}")
+        Returns:
+            Tuple[bool, str]: (éxito, mensaje)
+        """
+        try:
+            import subprocess
+            import sys
+            result = subprocess.run(
+                [sys.executable, "fix_model_compatibility.py"], 
+                capture_output=True, 
+                text=True
+            )
+            if result.returncode == 0:
+                return True, "Problema de compatibilidad solucionado"
+            return False, f"Error: {result.stderr}"
+        except Exception as fix_error:
+            return False, f"Error ejecutando solución: {fix_error}"
     
     @st.cache_resource
     def load_all_models(_self) -> Dict[str, tf.keras.Model]:
@@ -116,14 +108,22 @@ class ModelManager:
             dict: Diccionario con modelos cargados
         """
         models = {}
+        errors = {}
         model_dir = get_model_dir()
         
         for model_file in MODEL_CONFIG['default_models']:
             model_path = os.path.join(model_dir, model_file)
             if os.path.exists(model_path):
-                model = _self.load_model(model_path)
+                model, error = _self.load_model(model_path)
                 if model is not None:
                     models[model_file] = model
+                elif error is not None:
+                    errors[model_file] = error
+        
+        if errors:
+            st.warning("⚠️ Algunos modelos no pudieron ser cargados")
+            for model_file, error in errors.items():
+                st.error(f"❌ Error en {model_file}: {error['message']}")
         
         return models
     
