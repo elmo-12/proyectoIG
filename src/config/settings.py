@@ -61,7 +61,7 @@ IMAGE_CONFIG = {
 
 # Configuración de PDF
 PDF_CONFIG = {
-    "output_filename": "reporte_diagnostico_cana.pdf",
+    "output_filename": os.path.join(DIRECTORIES["temp"], "reporte_diagnostico_cana.pdf"),
     "page_size": "letter",
     "font_sizes": {
         "title": 24,
@@ -117,6 +117,16 @@ UI_CONFIG = {
     }
 }
 
+# Configuración de internacionalización
+I18N_CONFIG = {
+    "default_language": "es",
+    "supported_languages": {
+        "es": {"name": "Español", "flag": "🇪🇸"},
+        "en": {"name": "English", "flag": "🇺🇸"}
+    },
+    "translations_dir": "src/translations"
+}
+
 def get_model_dir():
     """Obtener directorio de modelos"""
     return DIRECTORIES["models"]
@@ -128,35 +138,37 @@ def get_info_dir():
 def get_temp_dir():
     """Obtener directorio temporal de la aplicación"""
     temp_dir = DIRECTORIES["temp"]
-    os.makedirs(temp_dir, exist_ok=True, mode=0o777)
-    return temp_dir
+    try:
+        # Crear el directorio temporal si no existe
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        # Verificar permisos creando un archivo de prueba
+        test_file = os.path.join(temp_dir, 'test.tmp')
+        with open(test_file, 'w') as f:
+            f.write('test')
+        os.remove(test_file)
+        
+        return temp_dir
+    except (IOError, OSError, PermissionError) as e:
+        # Si falla, usar un directorio temporal alternativo en el directorio del usuario
+        alt_temp_dir = os.path.join(os.path.expanduser('~'), '.sugarcane_temp')
+        try:
+            os.makedirs(alt_temp_dir, exist_ok=True)
+            return alt_temp_dir
+        except:
+            # Si todo falla, usar el directorio temporal del sistema
+            return tempfile.gettempdir()
 
 def ensure_directories():
     """Crear directorios necesarios si no existen"""
     # Crear directorios de la aplicación
     for key, directory in DIRECTORIES.items():
-        if key == "temp":
-            # Manejar directorio temporal de forma especial
-            os.makedirs(directory, exist_ok=True, mode=0o777)
-        else:
+        if key != "temp":  # El directorio temporal se maneja de forma especial
             os.makedirs(directory, exist_ok=True)
     
-    # Verificar permisos del directorio temporal
-    temp_dir = DIRECTORIES["temp"]
-    try:
-        # Intentar crear un archivo de prueba
-        test_file = os.path.join(temp_dir, 'test.tmp')
-        with open(test_file, 'w') as f:
-            f.write('test')
-        os.remove(test_file)
-    except (IOError, OSError) as e:
-        st.error(f"❌ Error de permisos en directorio temporal: {str(e)}")
-        st.error(f"Directorio temporal actual: {temp_dir}")
-        # Intentar usar un directorio temporal alternativo
-        alt_temp_dir = os.path.join(os.path.expanduser('~'), '.sugarcane_temp')
-        st.warning(f"Intentando usar directorio temporal alternativo: {alt_temp_dir}")
-        os.makedirs(alt_temp_dir, exist_ok=True, mode=0o777)
-        DIRECTORIES["temp"] = alt_temp_dir
+    # Asegurar que el directorio temporal existe y es accesible
+    temp_dir = get_temp_dir()
+    DIRECTORIES["temp"] = temp_dir  # Actualizar el directorio temporal con el que funciona
 
 def initialize_session_state():
     """Inicializar estado de sesión de Streamlit"""
@@ -171,6 +183,10 @@ def initialize_session_state():
     # Añadir directorio temporal al estado de la sesión
     if 'temp_dir' not in st.session_state:
         st.session_state.temp_dir = temp_dir
+    
+    # Inicializar idioma por defecto
+    if 'language' not in st.session_state:
+        st.session_state.language = I18N_CONFIG["default_language"]
 
 def get_available_models():
     """Obtener lista de modelos disponibles"""

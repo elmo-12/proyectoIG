@@ -1,0 +1,343 @@
+{
+  "app": {
+    "title": "Expert System for Sugarcane Disease Diagnosis",
+    "loading": "Loading",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "tabs": {
+    "config": "📤 Configuration",
+    "diagnosis": "🔍 Diagnosis",
+    "comparison": "📊 Compare Models"
+  },
+  "config": {
+    "title": "Model Configuration",
+    "model_selector": "Select the model to use:",
+    "system_info": "System Information",
+    "about_system": "About the System",
+    "system_description": "This expert system uses artificial intelligence to detect:",
+    "diseases": {
+      "healthy": "Healthy Plants",
+      "mosaic": "Mosaic",
+      "red_rot": "Red Rot",
+      "rust": "Rust",
+      "yellow": "Yellow"
+    },
+    "model_description": "The model has been trained with thousands of images to provide accurate and reliable diagnoses.",
+    "upload_model": "Upload model (.keras)",
+    "model_loaded": "Model '{model_name}' loaded successfully",
+    "model_loading": "Loading model...",
+    "model_selected_loading": "Loading selected model...",
+    "model_format_error": "Unsupported model format",
+    "model_load_warning": "Could not load model '{model_name}'",
+    "reportlab_available": "ReportLab available: PDF generation with full UTF-8 support",
+    "fpdf_available": "FPDF available: Basic PDF generation",
+    "fpdf_recommendation": "For better PDF quality, install: `pip install reportlab==4.0.4`",
+    "no_pdf_libraries": "No PDF libraries available",
+    "pdf_install_info": "Install ReportLab or FPDF to generate PDF reports"
+  },
+  "diagnosis": {
+    "no_model": "Please first load the model in the Configuration tab",
+    "demo_model_info": "You can also create a demo model",
+    "create_demo_model": "Create Demo Model",
+    "demo_model_creating": "Creating demo model...",
+    "demo_model_success": "Demo model created successfully",
+    "demo_model_error": "Error creating model: {error}",
+    "upload_image": "Upload Image",
+    "select_image": "Select leaf image",
+    "image_loaded": "Image loaded: {filename}",
+    "perform_diagnosis": "Perform Comparative Diagnosis",
+    "processing_image": "Processing image with multiple AI models...",
+    "analysis_complete_multiple": "Analysis completed with {count} model(s)",
+    "analysis_complete_single": "Analysis completed with single model",
+    "analysis_error": "Could not perform analysis",
+    "diagnosis_error": "Diagnosis error: {error}",
+    "consensus_diagnosis": "Consensus Diagnosis",
+    "diagnosis": "Diagnosis",
+    "confidence_level": "Confidence level:",
+    "details": "Details",
+    "treatment": "Treatment",
+    "comparison": "Comparison",
+    "analysis": "Analysis",
+    "description": "Description",
+    "symptoms": "Symptoms",
+    "recommended_treatment": "Recommended Treatment",
+    "preventive_measures": "Preventive Measures",
+    "consensus_analysis": "Consensus Analysis",
+    "probability_distribution": "Probability Distribution",
+    "generate_pdf": "Generate PDF Report",
+    "generate_pdf_comparative": "Generate Comparative PDF Report",
+    "generating_pdf": "Generating PDF report...",
+    "pdf_generation_error": "Error generating PDF: {error}",
+    "model_comparison": "Model Comparison",
+    "detailed_results": "Detailed Results by Model",
+    "model_agreement": "Agreement Status",
+    "model_match": "✅ Matches",
+    "model_differs": "⚠️ Differs"
+  },
+  "comparison": {
+    "title": "Diagnostic Models Comparison",
+    "no_models": "No models found to compare",
+    "load_models_info": "Load models in the Configuration tab to compare them",
+    "create_examples": "Create Example Models",
+    "examples_info": "To create example models for comparison, you can:",
+    "use_current_model": "Use current model: The model loaded in the Configuration tab",
+    "create_demo_models": "Create demo models: Run training scripts",
+    "load_external_models": "Load external models: Upload .keras files from your computer",
+    "auto_comparison": "Models will be compared automatically when available.",
+    "models_found": "Found {count} model(s) to compare",
+    "models_load_error": "Could not load model data",
+    "model_states": {
+      "excellent": "Excellent",
+      "acceptable": "Acceptable",
+      "needs_improvement": "Needs improvement",
+      "no_info": "No information"
+    },
+    "metrics": {
+      "model": "Model",
+      "accuracy": "Accuracy",
+      "loss": "Loss",
+      "f1_score": "Average F1-Score",
+      "size": "Size (MB)",
+      "creation_date": "Creation Date",
+      "state": "State"
+    },
+    "recommendations": "Recommendations",
+    "no_recommendations": "Not enough data to generate recommendations",
+    "best_accuracy": "Best Accuracy",
+    "best_f1": "Best F1-Score",
+    "smallest": "Smallest",
+    "best_model_analysis": "Best Model Analysis",
+    "main_stats": "Main Statistics",
+    "detailed_report": "Detailed Report",
+    "view_full_report": "View full report",
+    "accuracy_metric": "Accuracy: {accuracy:.2%}",
+    "loss_metric": "Loss: {loss:.4f}",
+    "model_prefix": "Model "
+  },
+  "diseases": {
+    "healthy": {
+      "name": "Healthy",
+      "description": "The plant shows signs of good health without disease symptoms.",
+      "symptoms": {
+        "0": "Intense and uniform green leaves",
+        "1": "Vigorous and uniform growth",
+        "2": "Absence of spots, lesions or discolorations",
+        "3": "Firm and well-developed stems",
+        "4": "Normal leaf structure"
+      },
+      "treatment": {
+        "0": "Maintain regular fertilization program",
+        "1": "Continue with adequate irrigation",
+        "2": "Perform periodic preventive monitoring",
+        "3": "Maintain good agricultural practices"
+      },
+      "prevention": {
+        "0": "Use of resistant varieties",
+        "1": "Maintain good soil drainage",
+        "2": "Weed control",
+        "3": "Crop rotation when possible"
+      }
+    },
+    "viral": {
+      "name": "Mosaic",
+      "description": "Viral disease that causes mosaic patterns on leaves, reducing photosynthesis.",
+      "symptoms": {
+        "0": "Light and dark green mosaic patterns",
+        "1": "Irregular spots on leaves",
+        "2": "Reduced plant growth",
+        "3": "Mottled appearance of leaves",
+        "4": "Interveinal chlorosis"
+      },
+      "treatment": {
+        "0": "Immediate removal of infected plants",
+        "1": "Control of insect vectors (aphids)",
+        "2": "Use of resistant varieties",
+        "3": "Implementation of physical barriers"
+      },
+      "prevention": {
+        "0": "Strict control of insect vectors",
+        "1": "Use of certified planting material",
+        "2": "Tool disinfection",
+        "3": "Management of host weeds"
+      }
+    },
+    "fungal": {
+      "name": "Red Rot",
+      "description": "Fungal disease caused by Colletotrichum falcatum that severely affects yield.",
+      "symptoms": {
+        "0": "Red spots on leaves and stems",
+        "1": "Reddish internal tissue in stems",
+        "2": "Leaf wilting",
+        "3": "Loss of plant vigor",
+        "4": "Necrotic lesions"
+      },
+      "treatment": {
+        "0": "Application of systemic fungicide (carbendazim)",
+        "1": "Immediate removal of infected plants",
+        "2": "Improvement of soil drainage",
+        "3": "Reduction of drought stress"
+      },
+      "prevention": {
+        "0": "Use of resistant varieties",
+        "1": "Treatment of cuttings before planting",
+        "2": "Adequate water management",
+        "3": "Control of insect vectors"
+      }
+    },
+    "rust": {
+      "name": "Rust",
+      "description": "Fungal disease that forms rust-colored pustules on leaves.",
+      "symptoms": {
+        "0": "Rust-colored pustules on leaf undersides",
+        "1": "Yellow spots on leaf surfaces",
+        "2": "Premature defoliation",
+        "3": "Reduction of photosynthetic leaf area",
+        "4": "Generalized chlorosis"
+      },
+      "treatment": {
+        "0": "Application of protective fungicides",
+        "1": "Improvement of crop ventilation",
+        "2": "Reduction of planting density",
+        "3": "Removal of infected debris"
+      },
+      "prevention": {
+        "0": "Use of resistant varieties",
+        "1": "Proper fertilization management",
+        "2": "Control of relative humidity",
+        "3": "Early symptom monitoring"
+      }
+    },
+    "nutritional": {
+      "name": "Yellow",
+      "description": "Condition that can be caused by nutritional deficiencies or environmental stress.",
+      "symptoms": {
+        "0": "Generalized yellowing of leaves",
+        "1": "Interveinal chlorosis",
+        "2": "Reduced growth",
+        "3": "Pale appearance of leaves",
+        "4": "Symptoms progressing from old leaves"
+      },
+      "treatment": {
+        "0": "Soil analysis to identify deficiencies",
+        "1": "Application of specific fertilizers",
+        "2": "Soil pH correction",
+        "3": "Drainage improvement if needed"
+      },
+      "prevention": {
+        "0": "Regular soil analysis",
+        "1": "Balanced fertilization program",
+        "2": "Proper irrigation management",
+        "3": "Soil pH monitoring"
+      }
+    }
+  },
+  "footer": {
+    "title": "Expert Diagnostic System",
+    "description": "Developed for early identification and effective management of sugarcane crop diseases",
+    "subtitle": "Using artificial intelligence and deep learning for accurate diagnoses"
+  },
+  "charts": {
+    "probability_percent": "Probability (%)",
+    "probability_distribution": "Probability Distribution",
+    "disease_classes": "Disease Classes",
+    "model_comparison": "Model Prediction Comparison",
+    "model_label": "Model ",
+    "confidence_level": "Confidence Level",
+    "probability": "Probability",
+    "average_predictions_distribution": "Average Predictions Distribution",
+    "detailed_model_comparison": "Detailed Model Comparison",
+    "model_performance": "Model Performance",
+    "accuracy": "Accuracy",
+    "recall": "Recall",
+    "f1_score": "F1-Score",
+    "training_evolution": "Accuracy Evolution during Training",
+    "epoch": "Epoch",
+    "training_accuracy": "Training Accuracy",
+    "validation_accuracy": "Validation Accuracy",
+    "current_model": "Current Model"
+  },
+  "comparison": {
+    "title": "Diagnostic Models Comparison",
+    "no_models": "No models found to compare",
+    "load_models_info": "Load models in the Configuration tab to compare them",
+    "create_examples": "Create Example Models",
+    "examples_info": "To create example models for comparison, you can:",
+    "use_current_model": "Use current model: The model loaded in the Configuration tab",
+    "create_demo_models": "Create demo models: Run training scripts",
+    "load_external_models": "Load external models: Upload .keras files from your computer",
+    "auto_comparison": "Models will be compared automatically when available.",
+    "models_found": "Found {count} model(s) to compare",
+    "models_load_error": "Could not load model data",
+    "model_states": {
+      "excellent": "Excellent",
+      "acceptable": "Acceptable",
+      "needs_improvement": "Needs improvement",
+      "no_info": "No information"
+    },
+    "metrics": {
+      "model": "Model",
+      "accuracy": "Accuracy",
+      "loss": "Loss",
+      "f1_score": "Average F1-Score",
+      "size": "Size (MB)",
+      "creation_date": "Creation Date",
+      "state": "State"
+    },
+    "summary_metrics": "Summary Metrics",
+    "average_accuracy": "Average Accuracy",
+    "total_size": "Total Size",
+    "detailed_table": "Detailed Table",
+    "recommendations": "Recommendations",
+    "no_recommendations": "Not enough data to generate recommendations",
+    "smallest": "Smallest",
+    "best_model_analysis": "Best Model Analysis",
+    "main_stats": "Main Statistics",
+    "detailed_report": "Detailed Report",
+    "view_full_report": "View full report",
+    "accuracy_metric": "- Accuracy: {accuracy:.2%}",
+    "loss_metric": "- Loss: {loss:.4f}"
+  },
+  "pdf": {
+    "install_libraries": "Install one of the following libraries:",
+    "recommended": "recommended",
+    "install_reportlab": "Install ReportLab",
+    "install_fpdf": "Install FPDF",
+    "installing": "Installing {package}...",
+    "install_success": "{package} installed successfully",
+    "restart_app": "Restart the application to use the new library",
+    "install_error": "Error installing {package}: {error}",
+    "comparative_diagnosis_title": "Comparative Sugarcane Diagnosis",
+    "diagnosis_title": "Sugarcane Diagnosis",
+    "multiple_models_analysis": "Multi-Model Analysis",
+    "models_used": "Models used",
+    "models": "models",
+    "model_number": "Model {number}",
+    "model_used": "Model used",
+    "accuracy": "Accuracy",
+    "analyzed_image": "Analyzed Image",
+    "diagnosis": "Diagnosis",
+    "confidence": "Confidence",
+    "description": "Description",
+    "symptoms": "Symptoms",
+    "visual_analysis": "Visual Analysis",
+    "probability_distribution": "Probability Distribution",
+    "probability_distribution_consensus": "Probability Distribution (Consensus)",
+    "technical_info": "Technical Information",
+    "loss": "Loss",
+    "confusion_matrix": "Confusion Matrix",
+    "pdf_generated_success": "PDF report generated successfully",
+    "download_report": "Download PDF Report",
+    "download_help": "Click to download the diagnosis PDF report"
+  },
+  "comparison": {
+    "charts": {
+      "title": "Visualizations",
+      "no_data": "Not enough data to generate charts",
+      "accuracy_by_model": "Accuracy by Model",
+      "f1_by_model": "F1-Score by Model"
+    }
+  }
+} 

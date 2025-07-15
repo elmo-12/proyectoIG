@@ -1,0 +1,369 @@
+{
+  "app": {
+    "title": "Sistema Experto de Diagnóstico de Enfermedades en Caña de Azúcar",
+    "loading": "Cargando",
+    "error": "Error",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "tabs": {
+    "config": "📤 Configuración",
+    "diagnosis": "🔍 Diagnóstico",
+    "comparison": "📊 Comparar Modelos"
+  },
+  "config": {
+    "title": "Configuración del Modelo",
+    "model_selector": "Selecciona el modelo a utilizar:",
+    "system_info": "Información del Sistema",
+    "about_system": "Sobre el Sistema",
+    "system_description": "Este sistema experto utiliza inteligencia artificial para detectar:",
+    "diseases": {
+      "healthy": "Plantas Sanas (Healthy)",
+      "mosaic": "Mosaico (Mosaic)",
+      "red_rot": "Pudrición Roja (Red Rot)",
+      "rust": "Roya (Rust)",
+      "yellow": "Amarillamiento (Yellow)"
+    },
+    "model_description": "El modelo ha sido entrenado con miles de imágenes para proporcionar diagnósticos precisos y confiables.",
+    "upload_model": "Cargar modelo (.keras)",
+    "model_loaded": "Modelo '{model_name}' cargado exitosamente",
+    "model_loading": "Cargando modelo...",
+    "model_selected_loading": "Cargando modelo seleccionado...",
+    "model_format_error": "Formato de modelo no soportado",
+    "model_load_warning": "No se pudo cargar el modelo '{model_name}'",
+    "reportlab_available": "ReportLab disponible: Generación de PDF con soporte completo UTF-8",
+    "fpdf_available": "FPDF disponible: Generación de PDF básica",
+    "fpdf_recommendation": "Para mejor calidad de PDF, instala: `pip install reportlab==4.0.4`",
+    "no_pdf_libraries": "No hay bibliotecas de PDF disponibles",
+    "pdf_install_info": "Instala ReportLab o FPDF para generar reportes PDF"
+  },
+  "diagnosis": {
+    "no_model": "Por favor, carga primero el modelo en la pestaña de Configuración",
+    "demo_model_info": "También puedes crear un modelo de demostración",
+    "create_demo_model": "Crear Modelo de Demostración",
+    "demo_model_creating": "Creando modelo de demostración...",
+    "demo_model_success": "Modelo de demostración creado exitosamente",
+    "demo_model_error": "Error al crear modelo: {error}",
+    "upload_image": "Cargar Imagen",
+    "select_image": "Seleccionar imagen de hoja",
+    "image_loaded": "Imagen cargada: {filename}",
+    "perform_diagnosis": "Realizar Diagnóstico Comparativo",
+    "processing_image": "Procesando imagen con múltiples modelos de IA...",
+    "analysis_complete_multiple": "Análisis completado con {count} modelo(s)",
+    "analysis_complete_single": "Análisis completado con modelo único",
+    "analysis_error": "No se pudo realizar el análisis",
+    "diagnosis_error": "Error en diagnóstico: {error}",
+    "consensus_diagnosis": "Diagnóstico de Consenso",
+    "diagnosis": "Diagnóstico",
+    "confidence_level": "Nivel de confianza:",
+    "details": "Detalles",
+    "treatment": "Tratamiento",
+    "comparison": "Comparación",
+    "analysis": "Análisis",
+    "description": "Descripción",
+    "symptoms": "Síntomas",
+    "recommended_treatment": "Tratamiento Recomendado",
+    "preventive_measures": "Medidas Preventivas",
+    "consensus_analysis": "Análisis del Consenso",
+    "probability_distribution": "Distribución de Probabilidades",
+    "generate_pdf": "Generar Reporte PDF",
+    "generate_pdf_comparative": "Generar Reporte PDF Comparativo",
+    "generating_pdf": "Generando reporte PDF...",
+    "pdf_generation_error": "Error al generar PDF: {error}",
+    "model_comparison": "Comparación de Modelos",
+    "detailed_results": "Resultados Detallados por Modelo",
+    "model_agreement": "Estado de Coincidencia",
+    "model_match": "✅ Coincide",
+    "model_differs": "⚠️ Difiere"
+  },
+  "comparison": {
+    "title": "Comparación de Modelos de Diagnóstico",
+    "no_models": "No se encontraron modelos para comparar",
+    "load_models_info": "Carga modelos en la pestaña de Configuración para poder compararlos",
+    "create_examples": "Crear Modelos de Ejemplo",
+    "examples_info": "Para crear modelos de ejemplo para comparación, puedes:",
+    "use_current_model": "Usar el modelo actual: El modelo cargado en la pestaña de Configuración",
+    "create_demo_models": "Crear modelos de demostración: Ejecutar scripts de entrenamiento",
+    "load_external_models": "Cargar modelos externos: Subir archivos .keras desde tu computadora",
+    "auto_comparison": "Los modelos se compararán automáticamente cuando estén disponibles.",
+    "models_found": "Se encontraron {count} modelo(s) para comparar",
+    "models_load_error": "No se pudieron cargar los datos de los modelos",
+    "model_states": {
+      "excellent": "Excelente",
+      "acceptable": "Aceptable",
+      "needs_improvement": "Necesita mejoras",
+      "no_info": "Sin información"
+    },
+    "metrics": {
+      "model": "Modelo",
+      "accuracy": "Precisión",
+      "loss": "Pérdida",
+      "f1_score": "F1-Score Promedio",
+      "size": "Tamaño (MB)",
+      "creation_date": "Fecha Creación",
+      "state": "Estado"
+    },
+    "recommendations": "Recomendaciones",
+    "no_recommendations": "No hay suficientes datos para generar recomendaciones",
+    "best_accuracy": "Mejor Precisión",
+    "best_f1": "Mejor F1-Score",
+    "smallest": "Más Pequeño",
+    "best_model_analysis": "Análisis del Mejor Modelo",
+    "main_stats": "Estadísticas Principales",
+    "detailed_report": "Reporte Detallado",
+    "view_full_report": "Ver reporte completo",
+    "accuracy_metric": "Precisión: {accuracy:.2%}",
+    "loss_metric": "Pérdida: {loss:.4f}",
+    "model_prefix": "Modelo "
+  },
+  "diseases": {
+    "healthy": {
+      "name": "Sana (Healthy)",
+      "description": "La planta muestra signos de buena salud sin síntomas de enfermedad.",
+      "symptoms": {
+        "0": "Hojas de color verde intenso y uniforme",
+        "1": "Crecimiento vigoroso y uniforme",
+        "2": "Ausencia de manchas, lesiones o decoloraciones",
+        "3": "Tallos firmes y bien desarrollados",
+        "4": "Estructura foliar normal"
+      },
+      "treatment": {
+        "0": "Mantener el programa regular de fertilización",
+        "1": "Continuar con el riego adecuado",
+        "2": "Realizar monitoreos preventivos periódicos",
+        "3": "Mantener buenas prácticas agrícolas"
+      },
+      "prevention": {
+        "0": "Uso de variedades resistentes",
+        "1": "Mantener buen drenaje del suelo",
+        "2": "Control de malezas",
+        "3": "Rotación de cultivos cuando sea posible"
+      }
+    },
+    "viral": {
+      "name": "Mosaico (Mosaic)",
+      "description": "Enfermedad viral que causa patrones de mosaico en las hojas, reduciendo la fotosíntesis.",
+      "symptoms": {
+        "0": "Patrones de mosaico verde claro y oscuro",
+        "1": "Manchas irregulares en las hojas",
+        "2": "Reducción del crecimiento de la planta",
+        "3": "Hojas con apariencia moteada",
+        "4": "Clorosis interveinal"
+      },
+      "treatment": {
+        "0": "Eliminación inmediata de plantas infectadas",
+        "1": "Control de insectos vectores (pulgones)",
+        "2": "Uso de variedades resistentes",
+        "3": "Implementación de barreras físicas"
+      },
+      "prevention": {
+        "0": "Control estricto de insectos vectores",
+        "1": "Uso de material de siembra certificado",
+        "2": "Desinfección de herramientas",
+        "3": "Manejo de malezas hospederas"
+      }
+    },
+    "fungal": {
+      "name": "Pudrición Roja (Red Rot)",
+      "description": "Enfermedad fúngica causada por Colletotrichum falcatum que afecta severamente el rendimiento.",
+      "symptoms": {
+        "0": "Manchas rojas en las hojas y tallos",
+        "1": "Tejido interno rojizo en los tallos",
+        "2": "Marchitamiento de las hojas",
+        "3": "Pérdida de vigor en la planta",
+        "4": "Lesiones necróticas"
+      },
+      "treatment": {
+        "0": "Aplicación de fungicida sistémico (carbendazim)",
+        "1": "Eliminación inmediata de plantas infectadas",
+        "2": "Mejora del drenaje del suelo",
+        "3": "Reducción del estrés por sequía"
+      },
+      "prevention": {
+        "0": "Uso de variedades resistentes",
+        "1": "Tratamiento de esquejes antes de la siembra",
+        "2": "Manejo adecuado del agua",
+        "3": "Control de insectos vectores"
+      }
+    },
+    "rust": {
+      "name": "Roya (Rust)",
+      "description": "Enfermedad fúngica que forma pústulas de color óxido en las hojas.",
+      "symptoms": {
+        "0": "Pústulas de color óxido en el envés de las hojas",
+        "1": "Manchas amarillas en el haz de las hojas",
+        "2": "Defoliación prematura",
+        "3": "Reducción del área foliar fotosintética",
+        "4": "Clorosis generalizada"
+      },
+      "treatment": {
+        "0": "Aplicación de fungicidas protectantes",
+        "1": "Mejora de la ventilación del cultivo",
+        "2": "Reducción de la densidad de siembra",
+        "3": "Eliminación de residuos infectados"
+      },
+      "prevention": {
+        "0": "Uso de variedades resistentes",
+        "1": "Manejo adecuado de la fertilización",
+        "2": "Control de la humedad relativa",
+        "3": "Monitoreo temprano de síntomas"
+      }
+    },
+    "nutritional": {
+      "name": "Amarillamiento (Yellow)",
+      "description": "Condición que puede ser causada por deficiencias nutricionales o estrés ambiental.",
+      "symptoms": {
+        "0": "Amarillamiento generalizado de las hojas",
+        "1": "Clorosis interveinal",
+        "2": "Reducción del crecimiento",
+        "3": "Hojas con apariencia pálida",
+        "4": "Síntomas que progresan desde hojas viejas"
+      },
+      "treatment": {
+        "0": "Análisis de suelo para identificar deficiencias",
+        "1": "Aplicación de fertilizantes específicos",
+        "2": "Corrección del pH del suelo",
+        "3": "Mejora del drenaje si es necesario"
+      },
+      "prevention": {
+        "0": "Análisis regular de suelo",
+        "1": "Programa de fertilización balanceado",
+        "2": "Manejo adecuado del riego",
+        "3": "Monitoreo de pH del suelo"
+      }
+    }
+  },
+  "footer": {
+    "title": "Sistema Experto de Diagnóstico",
+    "description": "Desarrollado para la identificación temprana y el manejo efectivo de enfermedades en cultivos de caña de azúcar",
+    "subtitle": "Utilizando inteligencia artificial y aprendizaje profundo para diagnósticos precisos"
+  },
+  "charts": {
+    "probability_percent": "Probabilidad (%)",
+    "probability_distribution": "Distribución de Probabilidades",
+    "disease_classes": "Clases de Enfermedad",
+    "model_comparison": "Comparación de Predicciones por Modelo",
+    "model_label": "Modelo ",
+    "confidence_level": "Nivel de Confianza",
+    "probability": "Probabilidad",
+    "average_predictions_distribution": "Distribución Promedio de Predicciones",
+    "detailed_model_comparison": "Comparación Detallada de Modelos",
+    "model_performance": "Rendimiento del Modelo",
+    "accuracy": "Precisión",
+    "recall": "Recall",
+    "f1_score": "F1-Score",
+    "training_evolution": "Evolución de la Precisión durante el Entrenamiento",
+    "epoch": "Época",
+    "training_accuracy": "Precisión Entrenamiento",
+    "validation_accuracy": "Precisión Validación",
+    "current_model": "Modelo Actual"
+  },
+  "comparison": {
+    "title": "Comparación de Modelos de Diagnóstico",
+    "no_models": "No se encontraron modelos para comparar",
+    "load_models_info": "Carga modelos en la pestaña de Configuración para poder compararlos",
+    "create_examples": "Crear Modelos de Ejemplo",
+    "examples_info": "Para crear modelos de ejemplo para comparación, puedes:",
+    "use_current_model": "Usar el modelo actual: El modelo cargado en la pestaña de Configuración",
+    "create_demo_models": "Crear modelos de demostración: Ejecutar scripts de entrenamiento",
+    "load_external_models": "Cargar modelos externos: Subir archivos .keras desde tu computadora",
+    "auto_comparison": "Los modelos se compararán automáticamente cuando estén disponibles.",
+    "models_found": "Se encontraron {count} modelo(s) para comparar",
+    "models_load_error": "No se pudieron cargar los datos de los modelos",
+    "model_states": {
+      "excellent": "Excelente",
+      "acceptable": "Aceptable",
+      "needs_improvement": "Necesita mejoras",
+      "no_info": "Sin información"
+    },
+    "metrics": {
+      "model": "Modelo",
+      "accuracy": "Precisión",
+      "loss": "Pérdida",
+      "f1_score": "F1-Score Promedio",
+      "size": "Tamaño (MB)",
+      "creation_date": "Fecha Creación",
+      "state": "Estado"
+    },
+    "summary_metrics": "Métricas de Resumen",
+    "average_accuracy": "Precisión Promedio",
+    "total_size": "Tamaño Total",
+    "detailed_table": "Tabla Detallada",
+    "recommendations": "Recomendaciones",
+    "no_recommendations": "No hay suficientes datos para generar recomendaciones",
+    "smallest": "Más Pequeño",
+    "best_model_analysis": "Análisis del Mejor Modelo",
+    "main_stats": "Estadísticas Principales",
+    "detailed_report": "Reporte Detallado",
+    "view_full_report": "Ver reporte completo",
+    "accuracy_metric": "- Precisión: {accuracy:.2%}",
+    "loss_metric": "- Pérdida: {loss:.4f}"
+  },
+  "pdf": {
+    "install_libraries": "Instala una de las siguientes bibliotecas:",
+    "recommended": "recomendado",
+    "install_reportlab": "Instalar ReportLab",
+    "install_fpdf": "Instalar FPDF",
+    "installing": "Instalando {package}...",
+    "install_success": "{package} instalado exitosamente",
+    "restart_app": "Reinicia la aplicación para usar la nueva biblioteca",
+    "install_error": "Error instalando {package}: {error}",
+    "comparative_diagnosis_title": "Diagnóstico Comparativo de Caña de Azúcar",
+    "diagnosis_title": "Diagnóstico de Caña de Azúcar",
+    "multiple_models_analysis": "Análisis con Múltiples Modelos",
+    "models_used": "Modelos utilizados",
+    "models": "modelos",
+    "model_number": "Modelo {number}",
+    "model_used": "Modelo utilizado",
+    "accuracy": "Precisión",
+    "analyzed_image": "Imagen Analizada",
+    "diagnosis": "Diagnóstico",
+    "confidence": "Confianza",
+    "description": "Descripción",
+    "symptoms": "Síntomas",
+    "visual_analysis": "Análisis Visual",
+    "probability_distribution": "Distribución de Probabilidades",
+    "probability_distribution_consensus": "Distribución de Probabilidades (Consenso)",
+    "technical_info": "Información Técnica",
+    "loss": "Pérdida",
+    "confusion_matrix": "Matriz de Confusión",
+    "pdf_generated_success": "Reporte PDF generado exitosamente",
+    "download_report": "Descargar Reporte PDF",
+    "download_help": "Haz clic para descargar el reporte PDF del diagnóstico"
+  },
+  "comparison": {
+    "title": "Comparación de Modelos de Diagnóstico",
+    "no_models": "No se encontraron modelos para comparar",
+    "load_models_info": "Carga modelos en la pestaña de Configuración para poder compararlos",
+    "create_examples": "Crear Modelos de Ejemplo",
+    "examples_info": "Para crear modelos de ejemplo para comparación, puedes:",
+    "use_current_model": "Usar el modelo actual: El modelo cargado en la pestaña de Configuración",
+    "create_demo_models": "Crear modelos de demostración: Ejecutar scripts de entrenamiento",
+    "load_external_models": "Cargar modelos externos: Subir archivos .keras desde tu computadora",
+    "auto_comparison": "Los modelos se compararán automáticamente cuando estén disponibles.",
+    "models_found": "Se encontraron {count} modelo(s) para comparar",
+    "models_load_error": "No se pudieron cargar los datos de los modelos",
+    "model_states": {
+      "excellent": "Excelente",
+      "acceptable": "Aceptable",
+      "needs_improvement": "Necesita mejoras",
+      "no_info": "Sin información"
+    },
+    "metrics": {
+      "model": "Modelo",
+      "accuracy": "Precisión",
+      "loss": "Pérdida",
+      "f1_score": "F1-Score Promedio",
+      "size": "Tamaño (MB)",
+      "creation_date": "Fecha Creación",
+      "state": "Estado"
+    },
+    "charts": {
+      "title": "Visualizaciones",
+      "no_data": "No hay datos suficientes para generar gráficos",
+      "accuracy_by_model": "Precisión por Modelo",
+      "f1_by_model": "F1-Score por Modelo"
+    }
+  }
+} 

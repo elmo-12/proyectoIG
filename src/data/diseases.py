@@ -1,6 +1,7 @@
 """
 Información detallada sobre enfermedades de caña de azúcar
 """
+from ..utils.i18n import t
 
 # Información detallada de enfermedades y sus tratamientos
 DISEASE_INFO = {
@@ -263,4 +264,61 @@ def is_healthy(disease_id):
     Returns:
         bool: True si es planta sana, False si es enfermedad
     """
-    return disease_id == 0 
+    return disease_id == 0
+
+def get_disease_info_translated(disease_id):
+    """
+    Obtener información traducida de una enfermedad específica
+    
+    Args:
+        disease_id (int): ID de la enfermedad
+        
+    Returns:
+        dict: Información traducida de la enfermedad
+    """
+    disease_info = get_disease_info(disease_id)
+    if not disease_info:
+        return None
+        
+    # Traducir información básica
+    translated_info = {
+        'name': t(f'diseases.{disease_info["category"]}.name'),
+        'color': disease_info['color'],
+        'description': t(f'diseases.{disease_info["category"]}.description'),
+        'symptoms': [
+            t(f'diseases.{disease_info["category"]}.symptoms.{i}')
+            for i in range(len(disease_info['symptoms']))
+        ],
+        'treatment': [
+            t(f'diseases.{disease_info["category"]}.treatment.{i}')
+            for i in range(len(disease_info['treatment']))
+        ],
+        'prevention': [
+            t(f'diseases.{disease_info["category"]}.prevention.{i}')
+            for i in range(len(disease_info['prevention']))
+        ],
+        'icon': disease_info['icon'],
+        'severity': disease_info['severity'],
+        'category': disease_info['category']
+    }
+    
+    return translated_info
+
+def get_disease_names_translated():
+    """
+    Obtener nombres de enfermedades traducidos
+    
+    Returns:
+        list: Lista de nombres de enfermedades traducidos
+    """
+    disease_names = []
+    for disease_id in range(5):  # 0-4 para las 5 enfermedades
+        disease_info = get_disease_info_translated(disease_id)
+        if disease_info:
+            disease_names.append(disease_info['name'])
+        else:
+            # Fallback a nombres originales
+            original_info = get_disease_info(disease_id)
+            disease_names.append(original_info['name'] if original_info else f"Clase {disease_id}")
+    
+    return disease_names 

@@ -11,7 +11,8 @@ import tempfile
 import os
 
 from ..config.settings import VISUALIZATION_CONFIG
-from ..data.diseases import get_all_diseases, get_disease_names, get_disease_colors
+from ..data.diseases import get_all_diseases, get_disease_names, get_disease_colors, get_disease_info_translated, get_disease_names_translated
+from ..utils.i18n import t
 
 class ChartGenerator:
     """Generador de gráficos para análisis de diagnóstico"""
@@ -23,7 +24,7 @@ class ChartGenerator:
         plt.style.use(self.config['chart_style'])
         
     def create_probability_chart(self, prediction: np.ndarray, 
-                               title: str = "Distribución de Probabilidades") -> plt.Figure:
+                               title: str = None) -> plt.Figure:
         """
         Crear gráfico de barras con probabilidades por clase
         
@@ -38,17 +39,18 @@ class ChartGenerator:
         fig.patch.set_facecolor(self.config['background_color'])
         ax.set_facecolor(self.config['background_color'])
         
-        # Obtener nombres y probabilidades
-        class_names = get_disease_names()
+        # Obtener nombres y probabilidades traducidos
+        class_names = get_disease_names_translated()
         probabilities = prediction[0] * 100
         colors = get_disease_colors()
         
         # Crear barras
         bars = ax.bar(class_names, probabilities, color=colors, alpha=0.8)
         
-        # Configurar ejes
-        ax.set_ylabel("Probabilidad (%)", color='white', fontsize=12)
-        ax.set_title(title, color='white', fontsize=14, fontweight='bold')
+        # Configurar ejes con traducciones
+        ax.set_ylabel(t('charts.probability_percent'), color='white', fontsize=12)
+        chart_title = title or t('charts.probability_distribution')
+        ax.set_title(chart_title, color='white', fontsize=14, fontweight='bold')
         ax.set_ylim([0, 100])
         plt.xticks(rotation=45, ha='right', color='white')
         ax.tick_params(axis='y', colors='white')
@@ -73,7 +75,7 @@ class ChartGenerator:
         return fig
     
     def create_comparative_chart(self, predictions: Dict[str, np.ndarray], 
-                               title: str = "Comparación de Predicciones por Modelo") -> plt.Figure:
+                               title: str = None) -> plt.Figure:
         """
         Crear gráfico comparativo de múltiples modelos
         
@@ -88,7 +90,7 @@ class ChartGenerator:
         fig.patch.set_facecolor(self.config['background_color'])
         ax.set_facecolor(self.config['background_color'])
         
-        class_names = get_disease_names()
+        class_names = get_disease_names_translated()
         model_names = list(predictions.keys())
         
         # Configurar posiciones de las barras
@@ -98,7 +100,7 @@ class ChartGenerator:
         # Crear barras para cada modelo
         for i, (model_name, prediction) in enumerate(predictions.items()):
             probabilities = prediction[0] * 100
-            model_label = model_name.replace('best_sugarcane_model', 'Modelo ').replace('.keras', '')
+            model_label = model_name.replace('best_sugarcane_model', t('charts.model_label')).replace('.keras', '')
             
             bars = ax.bar(x + i * width, probabilities, width, 
                          label=model_label, 
@@ -113,10 +115,11 @@ class ChartGenerator:
                            f'{height:.1f}%', ha='center', va='bottom',
                            color='white', fontsize=8, fontweight='bold')
         
-        # Configurar ejes
-        ax.set_ylabel("Probabilidad (%)", color='white', fontsize=12)
-        ax.set_xlabel("Clases de Enfermedad", color='white', fontsize=12)
-        ax.set_title(title, color='white', fontsize=16, fontweight='bold')
+        # Configurar ejes con traducciones
+        ax.set_ylabel(t('charts.probability_percent'), color='white', fontsize=12)
+        ax.set_xlabel(t('charts.disease_classes'), color='white', fontsize=12)
+        chart_title = title or t('charts.model_comparison')
+        ax.set_title(chart_title, color='white', fontsize=16, fontweight='bold')
         ax.set_xticks(x + width)
         ax.set_xticklabels(class_names, rotation=45, ha='right', color='white')
         ax.tick_params(axis='y', colors='white')
@@ -149,7 +152,7 @@ class ChartGenerator:
             mode = "gauge+number+delta",
             value = confidence,
             domain = {'x': [0, 1], 'y': [0, 1]},
-            title = {'text': "Nivel de Confianza"},
+            title = {'text': t('charts.confidence_level')},
             delta = {'reference': 80},
             gauge = {
                 'axis': {'range': [None, 100]},
@@ -197,7 +200,7 @@ class ChartGenerator:
         )])
         
         fig.update_layout(
-            title="Comparación Detallada de Modelos",
+            title=t('charts.detailed_model_comparison'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
             font={'color': 'white'}
@@ -215,8 +218,8 @@ class ChartGenerator:
         Returns:
             go.Figure: Gráfico radar de Plotly
         """
-        # Métricas para el radar
-        categories = ['Precisión', 'Recall', 'F1-Score', 'Accuracy']
+        # Métricas para el radar traducidas
+        categories = [t('charts.accuracy'), t('charts.recall'), t('charts.f1_score'), t('charts.accuracy')]
         
         # Valores del modelo (convertir a escala 0-100)
         values = [
@@ -232,7 +235,7 @@ class ChartGenerator:
             r=values,
             theta=categories,
             fill='toself',
-            name='Modelo Actual',
+            name=t('charts.current_model'),
             line_color='rgb(1,90,100)'
         ))
         
@@ -248,7 +251,7 @@ class ChartGenerator:
                 )
             ),
             showlegend=True,
-            title="Rendimiento del Modelo",
+            title=t('charts.model_performance'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
             font={'color': 'white'}
@@ -269,8 +272,8 @@ class ChartGenerator:
         # Calcular promedio de predicciones
         avg_predictions = np.mean([pred[0] for pred in predictions.values()], axis=0)
         
-        # Preparar datos
-        labels = get_disease_names()
+        # Preparar datos con traducciones
+        labels = get_disease_names_translated()
         values = avg_predictions * 100
         colors = get_disease_colors()
         
@@ -278,11 +281,11 @@ class ChartGenerator:
             labels=labels,
             values=values,
             marker_colors=colors,
-            hovertemplate='<b>%{label}</b><br>Probabilidad: %{value:.1f}%<extra></extra>'
+            hovertemplate=f'<b>%{{label}}</b><br>{t("charts.probability")}: %{{value:.1f}}%<extra></extra>'
         )])
         
         fig.update_layout(
-            title="Distribución Promedio de Predicciones",
+            title=t('charts.average_predictions_distribution'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
             font={'color': 'white'}
@@ -307,7 +310,7 @@ class ChartGenerator:
             fig.add_trace(go.Scatter(
                 y=model_history['train_accuracy'],
                 mode='lines+markers',
-                name='Precisión Entrenamiento',
+                name=t('charts.training_accuracy'),
                 line=dict(color='blue')
             ))
         
@@ -316,14 +319,14 @@ class ChartGenerator:
             fig.add_trace(go.Scatter(
                 y=model_history['val_accuracy'],
                 mode='lines+markers',
-                name='Precisión Validación',
+                name=t('charts.validation_accuracy'),
                 line=dict(color='orange')
             ))
         
         fig.update_layout(
-            title="Evolución de la Precisión durante el Entrenamiento",
-            xaxis_title="Época",
-            yaxis_title="Precisión",
+            title=t('charts.training_evolution'),
+            xaxis_title=t('charts.epoch'),
+            yaxis_title=t('charts.accuracy'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
             font={'color': 'white'}

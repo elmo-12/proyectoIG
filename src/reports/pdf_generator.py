@@ -10,10 +10,11 @@ import numpy as np
 from PIL import Image
 import streamlit as st
 
-from ..config.settings import PDF_CONFIG
+from ..config.settings import PDF_CONFIG, get_temp_dir
 from ..utils.text_utils import clean_text_robust
 from ..visualization.charts import ChartGenerator
 from ..models.model_manager import ModelManager
+from ..utils.i18n import t
 
 # Detectar bibliotecas PDF disponibles
 try:
@@ -64,14 +65,22 @@ class PDFReportGenerator:
             str: Ruta del archivo PDF o None si hay error
         """
         try:
-            pdf_path = None
+            # Asegurar que el directorio temporal existe y es accesible
+            temp_dir = get_temp_dir()
+            
+            # Generar un nombre único para el archivo PDF
+            timestamp = int(time.time())
+            pdf_filename = f"reporte_diagnostico_cana_{timestamp}.pdf"
+            pdf_path = os.path.join(temp_dir, pdf_filename)
             
             if REPORTLAB_AVAILABLE:
+                self.config['output_filename'] = pdf_path  # Actualizar la ruta del archivo
                 pdf_path = self._generate_reportlab_pdf(
                     image, disease_info, confidence, probabilities,
                     model_name, all_predictions, consensus_prediction
                 )
             elif FPDF_AVAILABLE:
+                self.config['output_filename'] = pdf_path  # Actualizar la ruta del archivo
                 pdf_path = self._generate_fpdf_pdf(
                     image, disease_info, confidence, probabilities,
                     model_name, all_predictions, consensus_prediction
@@ -80,11 +89,11 @@ class PDFReportGenerator:
                 self._show_pdf_error()
                 return None
             
-            # Crear botón de descarga si se generó el PDF exitosamente
-            if pdf_path:
-                self.create_download_button(pdf_path)
+            # Verificar que el archivo se creó correctamente
+            if pdf_path and os.path.exists(pdf_path):
                 return pdf_path
             else:
+                st.error(f"❌ {t('pdf.generation_failed')}")
                 return None
                 
         except Exception as e:
@@ -93,22 +102,22 @@ class PDFReportGenerator:
     
     def _show_pdf_error(self):
         """Mostrar error y opciones de instalación de librerías PDF"""
-        st.error("❌ No hay bibliotecas de PDF disponibles")
-        st.info("💡 Instala una de las siguientes bibliotecas:")
-        st.info("   - ReportLab (recomendado): `pip install reportlab==4.0.4`")
-        st.info("   - FPDF: `pip install fpdf2`")
+        st.error(f"❌ {t('config.no_pdf_libraries')}")
+        st.info(f"💡 {t('pdf.install_libraries')}")
+        st.info(f"   - ReportLab ({t('pdf.recommended')}): `pip install reportlab==4.0.4`")
+        st.info(f"   - FPDF: `pip install fpdf2`")
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("🔧 Instalar ReportLab"):
+            if st.button(f"🔧 {t('pdf.install_reportlab')}"):
                 self._install_package("reportlab==4.0.4")
         with col2:
-            if st.button("🔧 Instalar FPDF"):
+            if st.button(f"🔧 {t('pdf.install_fpdf')}"):
                 self._install_package("fpdf2")
     
     def _install_package(self, package_name: str):
         """Instalar paquete automáticamente"""
-        with st.spinner(f"⏳ Instalando {package_name}..."):
+        with st.spinner(f"⏳ {t('pdf.installing', package=package_name)}"):
             try:
                 import subprocess
                 import sys
@@ -118,12 +127,12 @@ class PDFReportGenerator:
                     text=True
                 )
                 if result.returncode == 0:
-                    st.success(f"✅ {package_name} instalado exitosamente")
-                    st.info("🔄 Reinicia la aplicación para usar la nueva biblioteca")
+                    st.success(f"✅ {t('pdf.install_success', package=package_name)}")
+                    st.info(f"🔄 {t('pdf.restart_app')}")
                 else:
-                    st.error(f"❌ Error instalando {package_name}: {result.stderr}")
+                    st.error(f"❌ {t('pdf.install_error', package=package_name, error=result.stderr)}")
             except Exception as e:
-                st.error(f"❌ Error: {str(e)}")
+                st.error(f"❌ {t('app.error')}: {str(e)}")
     
     def _generate_reportlab_pdf(self, 
                               image: Image.Image,
@@ -155,7 +164,7 @@ class PDFReportGenerator:
         )
         
         # Título
-        title = "🌿 Diagnóstico Comparativo de Caña de Azúcar" if all_predictions and len(all_predictions) > 1 else "🌿 Diagnóstico de Caña de Azúcar"
+        title = f"🌿 {t('pdf.comparative_diagnosis_title')}" if all_predictions and len(all_predictions) > 1 else f"�� {t('pdf.diagnosis_title')}"
         story.append(Paragraph(title, title_style))
         story.append(Spacer(1, 20))
         
@@ -242,26 +251,26 @@ class PDFReportGenerator:
     def _add_analysis_info(self, story, styles, model_name, all_predictions):
         """Añadir información del análisis (ReportLab)"""
         if all_predictions and len(all_predictions) > 1:
-            story.append(Paragraph("<b>Análisis con Múltiples Modelos:</b>", styles['Heading2']))
-            story.append(Paragraph(f"<b>Modelos utilizados:</b> {len(all_predictions)} modelos", styles['Normal']))
+            story.append(Paragraph(f"<b>{t('pdf.multiple_models_analysis')}:</b>", styles['Heading2']))
+            story.append(Paragraph(f"<b>{t('pdf.models_used')}:</b> {len(all_predictions)} {t('pdf.models')}", styles['Normal']))
             
             for i, (model_name_iter, prediction) in enumerate(all_predictions.items()):
                 model_info = self.model_manager.load_model_info(model_name_iter)
-                story.append(Paragraph(f"<b>Modelo {i+1} ({model_name_iter}):</b>", styles['Heading3']))
+                story.append(Paragraph(f"<b>{t('pdf.model_number', number=i+1)} ({model_name_iter}):</b>", styles['Heading3']))
                 if model_info:
-                    story.append(Paragraph(f"  • Precisión: {model_info['test_accuracy']:.2%}", styles['Normal']))
+                    story.append(Paragraph(f"  • {t('pdf.accuracy')}: {model_info['test_accuracy']:.2%}", styles['Normal']))
         else:
             if model_name:
-                story.append(Paragraph(f"<b>Modelo utilizado:</b> {model_name}", styles['Normal']))
+                story.append(Paragraph(f"<b>{t('pdf.model_used')}:</b> {model_name}", styles['Normal']))
                 model_info = self.model_manager.load_model_info(model_name)
                 if model_info:
-                    story.append(Paragraph(f"<b>Precisión:</b> {model_info['test_accuracy']:.2%}", styles['Normal']))
+                    story.append(Paragraph(f"<b>{t('pdf.accuracy')}:</b> {model_info['test_accuracy']:.2%}", styles['Normal']))
         
         story.append(Spacer(1, 20))
     
     def _add_image_section(self, story, styles, image, temp_files):
         """Añadir sección de imagen (ReportLab)"""
-        story.append(Paragraph("<b>Imagen Analizada:</b>", styles['Heading2']))
+        story.append(Paragraph(f"<b>{t('pdf.analyzed_image')}:</b>", styles['Heading2']))
         
         # Crear archivo temporal sin eliminarlo inmediatamente
         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_img_file:
@@ -273,13 +282,13 @@ class PDFReportGenerator:
 
     def _add_diagnosis_section(self, story, styles, disease_info, confidence):
         """Añadir sección de diagnóstico (ReportLab)"""
-        story.append(Paragraph(f"<b>Diagnóstico:</b> {disease_info['name']}", styles['Heading2']))
-        story.append(Paragraph(f"<b>Confianza:</b> {confidence:.1f}%", styles['Normal']))
-        story.append(Paragraph(f"<b>Descripción:</b> {disease_info['description']}", styles['Normal']))
+        story.append(Paragraph(f"<b>{t('pdf.diagnosis')}:</b> {disease_info['name']}", styles['Heading2']))
+        story.append(Paragraph(f"<b>{t('pdf.confidence')}:</b> {confidence:.1f}%", styles['Normal']))
+        story.append(Paragraph(f"<b>{t('pdf.description')}:</b> {disease_info['description']}", styles['Normal']))
         story.append(Spacer(1, 20))
         
         # Síntomas
-        story.append(Paragraph("<b>Síntomas:</b>", styles['Heading3']))
+        story.append(Paragraph(f"<b>{t('pdf.symptoms')}:</b>", styles['Heading3']))
         for symptom in disease_info['symptoms'][:3]:
             story.append(Paragraph(f"• {symptom}", styles['Normal']))
         
@@ -287,18 +296,18 @@ class PDFReportGenerator:
     
     def _add_charts_section(self, story, styles, probabilities, all_predictions, consensus_prediction, temp_files):
         """Añadir sección de gráficos (ReportLab)"""
-        story.append(Paragraph("<b>Análisis Visual:</b>", styles['Heading2']))
+        story.append(Paragraph(f"<b>{t('pdf.visual_analysis')}:</b>", styles['Heading2']))
         
         # Crear y guardar gráfico
         if consensus_prediction is not None:
             fig = self.chart_generator.create_probability_chart(
                 consensus_prediction, 
-                "Distribución de Probabilidades (Consenso)"
+                t('pdf.probability_distribution_consensus')
             )
         else:
             fig = self.chart_generator.create_probability_chart(
                 probabilities, 
-                "Distribución de Probabilidades"
+                t('pdf.probability_distribution')
             )
         
         # Crear archivo temporal sin eliminarlo inmediatamente
@@ -319,14 +328,14 @@ class PDFReportGenerator:
         if model_name:
             model_info = self.model_manager.load_model_info(model_name)
             if model_info:
-                story.append(Paragraph("<b>Información Técnica:</b>", styles['Heading2']))
-                story.append(Paragraph(f"Precisión: {model_info['test_accuracy']:.2%}", styles['Normal']))
-                story.append(Paragraph(f"Pérdida: {model_info['test_loss']:.4f}", styles['Normal']))
+                story.append(Paragraph(f"<b>{t('pdf.technical_info')}:</b>", styles['Heading2']))
+                story.append(Paragraph(f"{t('pdf.accuracy')}: {model_info['test_accuracy']:.2%}", styles['Normal']))
+                story.append(Paragraph(f"{t('pdf.loss')}: {model_info['test_loss']:.4f}", styles['Normal']))
             
             # Matriz de confusión
             confusion_path = self.model_manager.get_confusion_matrix_path(model_name)
             if confusion_path and os.path.exists(confusion_path):
-                story.append(Paragraph("<b>Matriz de Confusión:</b>", styles['Heading3']))
+                story.append(Paragraph(f"<b>{t('pdf.confusion_matrix')}:</b>", styles['Heading3']))
                 story.append(ReportLabImage(confusion_path, width=6*inch, height=4*inch))
     
     def _add_fpdf_header(self, pdf, all_predictions):
@@ -479,12 +488,12 @@ class PDFReportGenerator:
             except:
                 pass
             
-            st.success("✅ Reporte PDF generado exitosamente")
+            st.success(f"✅ {t('pdf.pdf_generated_success')}")
             st.download_button(
-                label="⬇️ Descargar Reporte PDF",
+                label=f"⬇️ {t('pdf.download_report')}",
                 data=base64.b64decode(b64),
                 file_name=self.config['output_filename'],
                 mime="application/pdf",
                 use_container_width=True,
-                help="Haz clic para descargar el reporte PDF del diagnóstico"
+                help=t('pdf.download_help')
             ) 

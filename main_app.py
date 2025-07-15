@@ -4,6 +4,7 @@ Aplicación principal del Sistema Experto de Diagnóstico de Enfermedades en Ca�
 import streamlit as st
 from src.config.settings import APP_CONFIG, initialize_session_state, ensure_directories
 from src.ui.components import UIComponents
+from src.utils.i18n import t
 
 def main():
     """Función principal de la aplicación"""
@@ -22,14 +23,17 @@ def main():
     # Crear instancia de componentes UI
     ui = UIComponents()
     
+    # Renderizar selector de idioma primero
+    ui.render_language_selector()
+    
     # Renderizar encabezado
     ui.render_header()
     
     # Crear pestañas principales
     tab1, tab2, tab3 = st.tabs([
-        ui.tabs["config"],
-        ui.tabs["diagnosis"], 
-        ui.tabs["comparison"]
+        t("tabs.config"),
+        t("tabs.diagnosis"), 
+        t("tabs.comparison")
     ])
     
     # Renderizar contenido de cada pestaña

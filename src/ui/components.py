@@ -6,6 +6,7 @@ import pandas as pd
 from typing import Dict, List, Any, Optional
 from PIL import Image
 import numpy as np
+import os
 
 from ..config.settings import UI_CONFIG, get_available_models, ensure_directories, initialize_session_state
 from ..models.model_manager import ModelManager
@@ -14,7 +15,8 @@ from ..services.image_processor import ImageProcessor
 from ..visualization.charts import ChartGenerator
 from ..reports.pdf_generator import PDFReportGenerator
 from ..ui.styles import apply_custom_styles, create_diagnosis_box, create_info_card, create_metric_container
-from ..data.diseases import get_disease_info
+from ..data.diseases import get_disease_info, get_disease_info_translated
+from ..utils.i18n import t, i18n
 
 class UIComponents:
     """Componentes de interfaz de usuario"""
@@ -30,22 +32,26 @@ class UIComponents:
         initialize_session_state()
         apply_custom_styles()
     
+    def render_language_selector(self):
+        """Renderizar selector de idioma"""
+        i18n.render_language_selector()
+    
     def render_header(self):
         """Renderizar encabezado principal"""
         st.markdown(
-            f"<h1 style='color: {UI_CONFIG['theme']['primary_color']}'>🌿 Sistema Experto de Diagnóstico de Enfermedades en Caña de Azúcar</h1>",
+            f"<h1 style='color: {UI_CONFIG['theme']['primary_color']}'>🌿 {t('app.title')}</h1>",
             unsafe_allow_html=True
         )
     
     def render_configuration_tab(self):
         """Renderizar pestaña de configuración"""
-        st.markdown("### Configuración del Modelo")
+        st.markdown(f"### {t('config.title')}")
         
         # Selector de modelo
         available_models = get_available_models()
         if available_models:
             selected_model = st.selectbox(
-                "Selecciona el modelo a utilizar:",
+                t('config.model_selector'),
                 available_models,
                 index=available_models.index(st.session_state.selected_model_file) if st.session_state.selected_model_file in available_models else 0,
                 key="model_selector"
@@ -68,19 +74,19 @@ class UIComponents:
     
     def _render_system_info(self):
         """Renderizar información del sistema"""
-        with st.expander("ℹ️ Información del Sistema", expanded=True):
-            info_content = """
+        with st.expander(f"ℹ️ {t('config.system_info')}", expanded=True):
+            info_content = f"""
             <div class='info-card'>
-                <h3>Sobre el Sistema</h3>
-                <p>Este sistema experto utiliza inteligencia artificial para detectar:</p>
+                <h3>{t('config.about_system')}</h3>
+                <p>{t('config.system_description')}</p>
                 <ul class='info-list'>
-                    <li>✅ Plantas Sanas (Healthy)</li>
-                    <li>🟡 Mosaico (Mosaic)</li>
-                    <li>🔴 Pudrición Roja (Red Rot)</li>
-                    <li>🟠 Roya (Rust)</li>
-                    <li>💛 Amarillamiento (Yellow)</li>
+                    <li>✅ {t('config.diseases.healthy')}</li>
+                    <li>🟡 {t('config.diseases.mosaic')}</li>
+                    <li>🔴 {t('config.diseases.red_rot')}</li>
+                    <li>🟠 {t('config.diseases.rust')}</li>
+                    <li>💛 {t('config.diseases.yellow')}</li>
                 </ul>
-                <p>El modelo ha sido entrenado con miles de imágenes para proporcionar diagnósticos precisos y confiables.</p>
+                <p>{t('config.model_description')}</p>
             </div>
             """
             st.markdown(info_content, unsafe_allow_html=True)
@@ -93,42 +99,42 @@ class UIComponents:
         from ..reports.pdf_generator import REPORTLAB_AVAILABLE, FPDF_AVAILABLE
         
         if REPORTLAB_AVAILABLE:
-            st.success("✅ ReportLab disponible: Generación de PDF con soporte completo UTF-8")
+            st.success(f"✅ {t('config.reportlab_available')}")
         elif FPDF_AVAILABLE:
-            st.info("⚠️ FPDF disponible: Generación de PDF básica")
-            st.info("💡 Para mejor calidad de PDF, instala: `pip install reportlab==4.0.4`")
+            st.info(f"⚠️ {t('config.fpdf_available')}")
+            st.info(f"💡 {t('config.fpdf_recommendation')}")
         else:
-            st.error("❌ No hay bibliotecas de PDF disponibles")
-            st.info("💡 Instala ReportLab o FPDF para generar reportes PDF")
+            st.error(f"❌ {t('config.no_pdf_libraries')}")
+            st.info(f"💡 {t('config.pdf_install_info')}")
     
     def _render_model_upload(self):
         """Renderizar sección de carga de modelo"""
-        model_file = st.file_uploader("Cargar modelo (.keras)", type=['keras', 'h5'])
+        model_file = st.file_uploader(t('config.upload_model'), type=['keras', 'h5'])
         
         if model_file is not None:
             if self.model_manager.validate_model_format(model_file.name):
-                with st.spinner("⏳ Cargando modelo..."):
+                with st.spinner(f"⏳ {t('config.model_loading')}"):
                     model_path = self.model_manager.save_uploaded_model(model_file, model_file.name)
-                    st.success(f"✅ Modelo '{model_file.name}' cargado exitosamente")
+                    st.success(f"✅ {t('config.model_loaded', model_name=model_file.name)}")
                     st.session_state.selected_model_file = model_file.name
                     st.session_state.model_loaded = False
                     st.session_state.model = None
                     st.experimental_rerun()
             else:
-                st.error("❌ Formato de modelo no soportado")
+                st.error(f"❌ {t('config.model_format_error')}")
     
     def _auto_load_model(self):
         """Auto-cargar modelo si existe"""
         if not st.session_state.model_loaded and st.session_state.selected_model_file:
             model_path = f"models/{st.session_state.selected_model_file}"
-            with st.spinner("⏳ Cargando modelo seleccionado..."):
+            with st.spinner(f"⏳ {t('config.model_selected_loading')}"):
                 model = self.model_manager.load_model(model_path)
                 if model is not None:
                     st.session_state.model = model
                     st.session_state.model_loaded = True
-                    st.success(f"✅ Modelo '{st.session_state.selected_model_file}' cargado exitosamente")
+                    st.success(f"✅ {t('config.model_loaded', model_name=st.session_state.selected_model_file)}")
                 else:
-                    st.warning(f"⚠️ No se pudo cargar el modelo '{st.session_state.selected_model_file}'")
+                    st.warning(f"⚠️ {t('config.model_load_warning', model_name=st.session_state.selected_model_file)}")
     
     def render_diagnosis_tab(self):
         """Renderizar pestaña de diagnóstico"""
@@ -152,15 +158,15 @@ class UIComponents:
     
     def _render_no_model_available(self):
         """Renderizar cuando no hay modelo disponible"""
-        st.warning("⚠️ Por favor, carga primero el modelo en la pestaña de Configuración")
-        st.info("💡 También puedes crear un modelo de demostración")
+        st.warning(f"⚠️ {t('diagnosis.no_model')}")
+        st.info(f"💡 {t('diagnosis.demo_model_info')}")
         
-        if st.button("🔧 Crear Modelo de Demostración", use_container_width=True):
+        if st.button(f"🔧 {t('diagnosis.create_demo_model')}", use_container_width=True):
             self._create_demo_model()
     
     def _create_demo_model(self):
         """Crear modelo de demostración"""
-        with st.spinner("⏳ Creando modelo de demostración..."):
+        with st.spinner(f"⏳ {t('diagnosis.demo_model_creating')}"):
             try:
                 import subprocess
                 import sys
@@ -172,18 +178,18 @@ class UIComponents:
                 )
                 
                 if result.returncode == 0:
-                    st.success("✅ Modelo de demostración creado exitosamente")
+                    st.success(f"✅ {t('diagnosis.demo_model_success')}")
                     st.session_state.model_loaded = True
                     st.experimental_rerun()
                 else:
-                    st.error(f"❌ Error al crear modelo: {result.stderr}")
+                    st.error(f"❌ {t('diagnosis.demo_model_error', error=result.stderr)}")
             except Exception as e:
-                st.error(f"❌ Error: {str(e)}")
+                st.error(f"❌ {t('app.error')}: {str(e)}")
     
     def _render_image_upload(self):
         """Renderizar sección de carga de imagen"""
-        st.markdown("### Cargar Imagen")
-        image_file = st.file_uploader("Seleccionar imagen de hoja", type=['jpg', 'jpeg', 'png'])
+        st.markdown(f"### {t('diagnosis.upload_image')}")
+        image_file = st.file_uploader(t('diagnosis.select_image'), type=['jpg', 'jpeg', 'png'])
         
         if image_file is not None:
             image = Image.open(image_file)
@@ -192,16 +198,16 @@ class UIComponents:
             if self.image_processor.validate_image(image):
                 # Mostrar imagen con estilo
                 st.markdown("<div class='image-container'>", unsafe_allow_html=True)
-                st.image(image, caption=f"Imagen cargada: {image_file.name}", use_column_width=True)
+                st.image(image, caption=t('diagnosis.image_loaded', filename=image_file.name), use_column_width=True)
                 st.markdown("</div>", unsafe_allow_html=True)
                 
                 # Botón de diagnóstico
-                if st.button("🔍 Realizar Diagnóstico Comparativo", use_container_width=True):
+                if st.button(f"🔍 {t('diagnosis.perform_diagnosis')}", use_container_width=True):
                     self._perform_diagnosis(image)
     
     def _perform_diagnosis(self, image: Image.Image):
         """Realizar diagnóstico de la imagen"""
-        with st.spinner("🔄 Procesando imagen con múltiples modelos de IA..."):
+        with st.spinner(f"🔄 {t('diagnosis.processing_image')}"):
             try:
                 # Realizar análisis completo
                 results = self.diagnosis_service.analyze_image(image)
@@ -215,23 +221,23 @@ class UIComponents:
                     model_used = results.get('model_used', 'unknown')
                     if model_used == 'multiple':
                         all_predictions = results.get('all_predictions', {})
-                        st.success(f"✅ Análisis completado con {len(all_predictions)} modelo(s)")
+                        st.success(f"✅ {t('diagnosis.analysis_complete_multiple', count=len(all_predictions))}")
                         
                         # Mostrar predicciones individuales
                         for model_name, pred in all_predictions.items():
                             model_pred_class = np.argmax(pred[0])
                             model_conf = pred[0][model_pred_class] * 100
-                            model_disease = get_disease_info(model_pred_class)['name']
+                            model_disease = get_disease_info_translated(model_pred_class)['name']
                             st.info(f"📊 {model_name}: {model_disease} ({model_conf:.1f}%)")
                     else:
-                        st.success("✅ Análisis completado con modelo único")
+                        st.success(f"✅ {t('diagnosis.analysis_complete_single')}")
                         
                     st.experimental_rerun()
                 else:
-                    st.error("❌ No se pudo realizar el análisis")
+                    st.error(f"❌ {t('diagnosis.analysis_error')}")
                     
             except Exception as e:
-                st.error(f"❌ Error en diagnóstico: {str(e)}")
+                st.error(f"❌ {t('diagnosis.diagnosis_error', error=str(e))}")
     
     def _render_diagnosis_results(self):
         """Renderizar resultados del diagnóstico"""
@@ -242,11 +248,11 @@ class UIComponents:
         
         predicted_class = results['predicted_class']
         confidence = results['confidence']
-        disease_info = results['disease_info']
+        disease_info = get_disease_info_translated(predicted_class)
         
         # Caja de diagnóstico principal
         box_type = "healthy" if predicted_class == 0 else "disease"
-        diagnosis_title = "Diagnóstico de Consenso" if results.get('all_predictions') else "Diagnóstico"
+        diagnosis_title = t('diagnosis.consensus_diagnosis') if results.get('all_predictions') else t('diagnosis.diagnosis')
         
         # Crear contenido del diagnóstico
         diagnosis_content = f"""
@@ -257,7 +263,7 @@ class UIComponents:
                         {disease_info['name']}
                     </p>
                     <p style='font-size: 1.2em; margin: 1rem 0; color: #E0E0E0;'>
-                        Nivel de confianza:
+                        {t('diagnosis.confidence_level')}
                         <span style='font-size: 1.4em; font-weight: bold; color: {disease_info['color']};'>
                             {confidence:.1f}%
                         </span>
@@ -273,58 +279,67 @@ class UIComponents:
         
         # Botón de reporte PDF
         self._render_pdf_button(results)
-    
+
     def _render_detailed_info_tabs(self, results: Dict):
         """Renderizar pestañas de información detallada"""
-        disease_info = results['disease_info']
+        disease_info = get_disease_info_translated(results['predicted_class'])
         
         if results.get('all_predictions'):
-            info_tabs = st.tabs(["📋 Detalles", "💊 Tratamiento", "📊 Comparación", "📈 Análisis"])
+            info_tabs = st.tabs([
+                f"📋 {t('diagnosis.details')}", 
+                f"💊 {t('diagnosis.treatment')}", 
+                f"📊 {t('diagnosis.comparison')}", 
+                f"📈 {t('diagnosis.analysis')}"
+            ])
             tab_comparison = info_tabs[2]
             tab_analysis = info_tabs[3]
         else:
-            info_tabs = st.tabs(["📋 Detalles", "💊 Tratamiento", "📊 Análisis"])
+            info_tabs = st.tabs([
+                f"📋 {t('diagnosis.details')}", 
+                f"💊 {t('diagnosis.treatment')}", 
+                f"📊 {t('diagnosis.analysis')}"
+            ])
             tab_analysis = info_tabs[2]
         
         # Pestaña de detalles
         with info_tabs[0]:
             self._render_details_tab(disease_info)
-        
+            
         # Pestaña de tratamiento
         with info_tabs[1]:
             self._render_treatment_tab(disease_info)
-        
+            
         # Pestaña de comparación (si hay múltiples modelos)
         if results.get('all_predictions'):
             with tab_comparison:
                 self._render_comparison_tab(results)
-        
+            
         # Pestaña de análisis
         with tab_analysis:
             self._render_analysis_tab(results)
-    
+
     def _render_details_tab(self, disease_info: Dict):
         """Renderizar pestaña de detalles"""
-        st.markdown("### 📋 Descripción")
-        st.markdown(create_info_card("Descripción", disease_info['description']), unsafe_allow_html=True)
+        st.markdown(f"### 📋 {t('diagnosis.description')}")
+        st.markdown(create_info_card(t('diagnosis.description'), disease_info['description']), unsafe_allow_html=True)
         
-        st.markdown("### 🔍 Síntomas")
+        st.markdown(f"### 🔍 {t('diagnosis.symptoms')}")
         for symptom in disease_info['symptoms']:
             st.markdown(f"• {symptom}")
-    
+
     def _render_treatment_tab(self, disease_info: Dict):
         """Renderizar pestaña de tratamiento"""
-        st.markdown("### 💊 Tratamiento Recomendado")
+        st.markdown(f"### 💊 {t('diagnosis.recommended_treatment')}")
         for treatment in disease_info['treatment']:
             st.markdown(f"• {treatment}")
-        
-        st.markdown("### 🛡️ Medidas Preventivas")
+            
+        st.markdown(f"### 🛡️ {t('diagnosis.preventive_measures')}")
         for prevention in disease_info['prevention']:
             st.markdown(f"• {prevention}")
-    
+
     def _render_comparison_tab(self, results: Dict):
         """Renderizar pestaña de comparación"""
-        st.markdown("### 📊 Comparación de Modelos")
+        st.markdown(f"### 📊 {t('diagnosis.model_comparison')}")
         
         all_predictions = results['all_predictions']
         
@@ -334,10 +349,10 @@ class UIComponents:
         
         # Tabla de resultados
         self._render_comparison_table(results)
-    
+
     def _render_comparison_table(self, results: Dict):
         """Renderizar tabla de comparación"""
-        st.markdown("#### 📋 Resultados Detallados por Modelo")
+        st.markdown(f"#### 📋 {t('diagnosis.detailed_results')}")
         
         comparison_data = []
         predicted_class = results['predicted_class']
@@ -345,48 +360,46 @@ class UIComponents:
         for model_name, pred in results['all_predictions'].items():
             model_pred_class = np.argmax(pred[0])
             model_conf = pred[0][model_pred_class] * 100
-            model_disease = get_disease_info(model_pred_class)['name']
+            model_disease = get_disease_info_translated(model_pred_class)['name']
             model_info = self.model_manager.load_model_info(model_name)
             
             comparison_data.append({
-                'Modelo': model_name.replace('best_sugarcane_model', 'Modelo ').replace('.keras', ''),
-                'Diagnóstico': model_disease,
-                'Confianza': f"{model_conf:.1f}%",
-                'Precisión del Modelo': f"{model_info['test_accuracy']:.2%}" if model_info else "N/A",
-                'Estado': '✅ Coincide' if model_pred_class == predicted_class else '⚠️ Difiere'
+                t('comparison.metrics.model'): model_name.replace('best_sugarcane_model', t('comparison.model_prefix')).replace('.keras', ''),
+                t('diagnosis.diagnosis'): model_disease,
+                t('diagnosis.confidence_level'): f"{model_conf:.1f}%",
+                t('comparison.metrics.accuracy'): f"{model_info['test_accuracy']:.2%}" if model_info else "N/A",
+                t('diagnosis.model_agreement'): t('diagnosis.model_match') if model_pred_class == predicted_class else t('diagnosis.model_differs')
             })
         
         comparison_df = pd.DataFrame(comparison_data)
         st.dataframe(comparison_df, use_container_width=True)
-    
+
     def _render_analysis_tab(self, results: Dict):
         """Renderizar pestaña de análisis"""
-        title = "📈 Análisis del Consenso" if results.get('all_predictions') else "📊 Distribución de Probabilidades"
-        st.markdown(f"### {title}")
-        
-        # Gráfico de probabilidades
-        if results.get('consensus_prediction') is not None:
-            fig = self.chart_generator.create_probability_chart(results['consensus_prediction'])
-        else:
-            fig = self.chart_generator.create_probability_chart(results['prediction'])
-        
-        st.pyplot(fig)
-    
+        if 'all_predictions' in results:
+            st.markdown(f"#### {t('diagnosis.consensus_analysis')}")
+            
+            # Gráfico de distribución de probabilidades
+            st.markdown(f"##### {t('diagnosis.probability_distribution')}")
+            chart = self.chart_generator.create_probability_chart(results['prediction'])
+            st.plotly_chart(chart, use_container_width=True)
+
     def _render_pdf_button(self, results: Dict):
         """Renderizar botón de generación de PDF"""
-        st.markdown("---")
-        st.markdown("### 📄 Generar Reporte PDF")
-        
-        if st.button("📄 Generar Reporte PDF Comparativo", use_container_width=True):
+        if st.button(f"📄 {t('diagnosis.generate_pdf')}", use_container_width=True):
             self._generate_pdf_report(results)
-    
+
     def _generate_pdf_report(self, results: Dict):
         """Generar reporte PDF"""
-        with st.spinner("⏳ Generando reporte PDF..."):
-            try:
+        try:
+            with st.spinner(t('diagnosis.generating_pdf')):
+                # Obtener información traducida de la enfermedad
+                disease_info = get_disease_info_translated(results['predicted_class'])
+                
+                # Generar PDF
                 pdf_path = self.pdf_generator.generate_report(
                     image=st.session_state.current_image,
-                    disease_info=results['disease_info'],
+                    disease_info=disease_info,
                     confidence=results['confidence'],
                     probabilities=results['prediction'],
                     model_name=st.session_state.selected_model_file,
@@ -394,28 +407,45 @@ class UIComponents:
                     consensus_prediction=results.get('consensus_prediction')
                 )
                 
-                if pdf_path:
-                    self.pdf_generator.create_download_button(pdf_path)
-                    
-            except Exception as e:
-                st.error(f"❌ Error al generar PDF: {str(e)}")
+                if pdf_path and os.path.exists(pdf_path):
+                    try:
+                        # Leer el archivo PDF en memoria
+                        with open(pdf_path, "rb") as pdf_file:
+                            pdf_bytes = pdf_file.read()
+                        
+                        # Mostrar mensaje de éxito y botón de descarga
+                        st.success(t('pdf.pdf_generated_success'))
+                        st.download_button(
+                            label=f"📥 {t('pdf.download_report')}",
+                            data=pdf_bytes,
+                            file_name="diagnosis_report.pdf",
+                            mime="application/pdf",
+                            help=t('pdf.download_help'),
+                            use_container_width=True
+                        )
+                    except Exception as e:
+                        st.error(f"❌ {t('pdf.download_error')}: {str(e)}")
+                    finally:
+                        # Limpiar archivo temporal
+                        try:
+                            if os.path.exists(pdf_path):
+                                os.unlink(pdf_path)
+                        except Exception as e:
+                            st.warning(f"⚠️ {t('pdf.cleanup_warning')}: {str(e)}")
+                else:
+                    st.error(t('pdf.generation_failed'))
+        except Exception as e:
+            st.error(t('diagnosis.pdf_generation_error', error=str(e)))
     
     def render_comparison_tab(self):
         """Renderizar pestaña de comparación de modelos"""
-        from ..ui.model_comparison import ModelComparisonUI
+        from .model_comparison import ModelComparisonUI
         comparison_ui = ModelComparisonUI()
         comparison_ui.render()
     
     def render_footer(self):
         """Renderizar pie de página"""
         st.markdown("---")
-        footer_content = """
-        <div class='footer'>
-            <h3>🌿 Sistema Experto de Diagnóstico</h3>
-            <p>Desarrollado para la identificación temprana y el manejo efectivo de enfermedades en cultivos de caña de azúcar</p>
-            <p style='color: #666; font-size: 0.9em; margin-top: 1rem;'>
-                Utilizando inteligencia artificial y aprendizaje profundo para diagnósticos precisos
-            </p>
-        </div>
-        """
-        st.markdown(footer_content, unsafe_allow_html=True) 
+        st.markdown(f"### {t('footer.title')}")
+        st.markdown(f"*{t('footer.description')}*")
+        st.markdown(f"*{t('footer.subtitle')}*") 
