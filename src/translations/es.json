@@ -80,7 +80,8 @@
     "detailed_results": "Resultados Detallados por Modelo",
     "model_agreement": "Estado de Coincidencia",
     "model_match": "✅ Coincide",
-    "model_differs": "⚠️ Difiere"
+    "model_differs": "⚠️ Difiere",
+    "camera_help": "Presiona el botón para abrir la cámara de tu dispositivo y tomar una foto"
   },
   "comparison": {
     "title": "Comparación de Modelos de Diagnóstico",
