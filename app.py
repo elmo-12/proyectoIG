@@ -610,10 +610,10 @@ def get_consensus_prediction(predictions):
 
 def create_probability_chart(prediction, disease_info):
     """Crea gráfico de probabilidades"""
-    plt.style.use('dark_background')
+    plt.style.use('default')
     fig, ax = plt.subplots(figsize=(12, 6))
-    fig.patch.set_facecolor('#1E1E1E')
-    ax.set_facecolor('#1E1E1E')
+    fig.patch.set_facecolor('#FFFFFF')
+    ax.set_facecolor('#FFFFFF')
     
     # Crear barras
     class_names = [info['name'] for info in disease_info.values()]
@@ -623,10 +623,10 @@ def create_probability_chart(prediction, disease_info):
     bars = ax.bar(class_names, probabilities, color=colors)
     
     # Configurar ejes
-    ax.set_ylabel("Probabilidad (%)", color='white')
+    ax.set_ylabel("Probabilidad (%)", color='black')
     ax.set_ylim([0, 100])
-    plt.xticks(rotation=45, ha='right', color='white')
-    ax.tick_params(axis='y', colors='white')
+    plt.xticks(rotation=45, ha='right', color='black')
+    ax.tick_params(axis='y', colors='black')
     
     # Añadir valores sobre las barras
     for bar in bars:
@@ -637,7 +637,7 @@ def create_probability_chart(prediction, disease_info):
             f'{height:.1f}%',
             ha='center',
             va='bottom',
-            color='white',
+            color='black',
             fontweight='bold'
         )
     
@@ -646,10 +646,10 @@ def create_probability_chart(prediction, disease_info):
 
 def create_comparative_chart(predictions, disease_info):
     """Crea gráfico comparativo de predicciones de múltiples modelos"""
-    plt.style.use('dark_background')
+    plt.style.use('default')
     fig, ax = plt.subplots(figsize=(15, 8))
-    fig.patch.set_facecolor('#1E1E1E')
-    ax.set_facecolor('#1E1E1E')
+    fig.patch.set_facecolor('#FFFFFF')
+    ax.set_facecolor('#FFFFFF')
     
     class_names = [info['name'] for info in disease_info.values()]
     model_names = list(predictions.keys())
@@ -676,15 +676,15 @@ def create_comparative_chart(predictions, disease_info):
             if height > 5:  # Solo mostrar si la probabilidad es mayor a 5%
                 ax.text(bar.get_x() + bar.get_width()/2., height + 1,
                        f'{height:.1f}%', ha='center', va='bottom',
-                       color='white', fontsize=8, fontweight='bold')
+                       color='black', fontsize=8, fontweight='bold')
     
     # Configurar ejes
-    ax.set_ylabel("Probabilidad (%)", color='white')
-    ax.set_xlabel("Clases de Enfermedad", color='white')
-    ax.set_title("Comparación de Predicciones por Modelo", color='white', fontsize=16)
+    ax.set_ylabel("Probabilidad (%)", color='black')
+    ax.set_xlabel("Clases de Enfermedad", color='black')
+    ax.set_title("Comparación de Predicciones por Modelo", color='black', fontsize=16)
     ax.set_xticks(x + width)
-    ax.set_xticklabels(class_names, rotation=45, ha='right', color='white')
-    ax.tick_params(axis='y', colors='white')
+    ax.set_xticklabels(class_names, rotation=45, ha='right', color='black')
+    ax.tick_params(axis='y', colors='black')
     ax.legend(loc='upper right')
     ax.set_ylim([0, 100])
     
@@ -854,7 +854,7 @@ def model_comparison():
             fig1.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white'),
+                font=dict(color='black'),
                 yaxis=dict(tickformat='.0%')
             )
             st.plotly_chart(fig1, use_container_width=True)
@@ -869,7 +869,7 @@ def model_comparison():
             fig2.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white')
+                font=dict(color='black')
             )
             st.plotly_chart(fig2, use_container_width=True)
         
@@ -883,7 +883,7 @@ def model_comparison():
         fig3.update_layout(
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='white')
+            font=dict(color='black')
         )
         st.plotly_chart(fig3, use_container_width=True)
     
@@ -895,7 +895,7 @@ def model_comparison():
         fig4.update_layout(
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='white')
+            font=dict(color='black')
         )
         st.plotly_chart(fig4, use_container_width=True)
     

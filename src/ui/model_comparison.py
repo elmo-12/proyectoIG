@@ -226,7 +226,7 @@ class ModelComparisonUI:
             fig1.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white'),
+                font=dict(color='black'),
                 yaxis=dict(tickformat='.0%')
             )
             st.plotly_chart(fig1, use_container_width=True)
@@ -244,7 +244,7 @@ class ModelComparisonUI:
             fig2.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white')
+                font=dict(color='black')
             )
             st.plotly_chart(fig2, use_container_width=True)
         
@@ -264,7 +264,7 @@ class ModelComparisonUI:
             fig3.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white')
+                font=dict(color='black')
             )
             st.plotly_chart(fig3, use_container_width=True)
         
@@ -280,7 +280,7 @@ class ModelComparisonUI:
             fig4.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
-                font=dict(color='white')
+                font=dict(color='black')
             )
             st.plotly_chart(fig4, use_container_width=True)
     

@@ -79,11 +79,11 @@ PDF_CONFIG = {
 
 # Configuración de visualización
 VISUALIZATION_CONFIG = {
-    "chart_style": "dark_background",
+    "chart_style": "default",
     "figure_size": (12, 6),
     "dpi": 150,
     "chart_colors": ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'],
-    "background_color": "#1E1E1E"
+    "background_color": "#FFFFFF"
 }
 
 # Configuración de sesión
@@ -110,8 +110,8 @@ UI_CONFIG = {
         "comparison": "📊 Comparar Modelos"
     },
     "theme": {
-        "background_color": "#0E1117",
-        "text_color": "#E0E0E0",
+        "background_color": "#FFFFFF",
+        "text_color": "#262730",
         "primary_color": "#2E7D32",
         "secondary_color": "#4CAF50"
     }

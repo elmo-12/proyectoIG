@@ -10,7 +10,7 @@ def apply_custom_styles():
     
     css_styles = f"""
     <style>
-        /* Tema oscuro general */
+        /* Tema claro general */
         .main {{
             background-color: {theme['background_color']};
             color: {theme['text_color']};
@@ -39,31 +39,32 @@ def apply_custom_styles():
             padding: 2rem;
             border-radius: 15px;
             margin: 1rem 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            background-color: #1E1E1E;
+            background-color: #F8F9FA;
+            border: 1px solid #E9ECEF;
         }}
         .diagnosis-box:hover {{
             transform: translateY(-5px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
         }}
         .healthy {{
-            background-color: rgba(76, 175, 80, 0.2);
+            background-color: rgba(76, 175, 80, 0.1);
             border: 2px solid #4CAF50;
         }}
         .disease {{
-            background-color: rgba(244, 67, 54, 0.2);
+            background-color: rgba(244, 67, 54, 0.1);
             border: 2px solid #F44336;
         }}
         
         /* Tarjetas de información */
         .info-card {{
-            background-color: #1E1E1E;
+            background-color: #F8F9FA;
             padding: 1.5rem;
             border-radius: 10px;
             margin: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 1px solid #333333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #E9ECEF;
         }}
         
         /* Textos y encabezados */
@@ -74,36 +75,37 @@ def apply_custom_styles():
             font-size: 2.5em;
             font-weight: 700;
             padding: 1rem;
-            background: linear-gradient(90deg, #1E1E1E, #2E2E2E);
+            background: linear-gradient(90deg, #F8F9FA, #E9ECEF);
             border-radius: 10px;
+            border: 1px solid #DEE2E6;
         }}
         h2 {{
-            color: {theme['secondary_color']};
+            color: {theme['primary_color']};
             margin-top: 2rem;
             font-weight: 600;
         }}
         h3 {{
-            color: #81C784;
+            color: {theme['secondary_color']};
             margin-top: 1.5rem;
         }}
         
         /* Contenedor de métricas */
         .metric-container {{
-            background-color: #1E1E1E;
+            background-color: #F8F9FA;
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin: 1rem 0;
-            border: 1px solid #333333;
+            border: 1px solid #E9ECEF;
         }}
         
         /* Pie de página */
         .footer {{
             text-align: center;
             padding: 2rem;
-            background-color: #1E1E1E;
+            background-color: #F8F9FA;
             margin-top: 3rem;
-            border-top: 1px solid #333333;
+            border-top: 1px solid #E9ECEF;
         }}
         
         /* Listas */
@@ -114,23 +116,24 @@ def apply_custom_styles():
         .info-list li {{
             padding: 0.5rem 1rem;
             margin: 0.5rem 0;
-            background-color: #252525;
+            background-color: #FFFFFF;
             border-radius: 5px;
             border-left: 4px solid {theme['secondary_color']};
+            border: 1px solid #E9ECEF;
         }}
         
         /* Separadores */
         hr {{
-            border-color: #333333;
+            border-color: #E9ECEF;
             margin: 2rem 0;
         }}
         
         /* Contenedor de imágenes */
         .image-container {{
-            background-color: #1E1E1E;
+            background-color: #F8F9FA;
             padding: 1rem;
             border-radius: 10px;
-            border: 1px solid #333333;
+            border: 1px solid #E9ECEF;
         }}
         
         /* Tooltip personalizado */
@@ -145,16 +148,16 @@ def apply_custom_styles():
             left: 50%;
             transform: translateX(-50%);
             padding: 0.5rem;
-            background-color: #333333;
+            background-color: #495057;
             color: white;
             border-radius: 5px;
             font-size: 0.9em;
             white-space: nowrap;
         }}
         
-        /* Ajustes para el modo oscuro de Streamlit */
+        /* Ajustes para el modo claro de Streamlit */
         .stSelectbox, .stTextInput {{
-            background-color: #1E1E1E;
+            background-color: #FFFFFF;
         }}
         
         /* Alertas personalizadas */
@@ -167,22 +170,22 @@ def apply_custom_styles():
         .alert-success {{
             background-color: rgba(76, 175, 80, 0.1);
             border-color: #4CAF50;
-            color: #4CAF50;
+            color: #2E7D32;
         }}
         .alert-warning {{
             background-color: rgba(255, 152, 0, 0.1);
             border-color: #FF9800;
-            color: #FF9800;
+            color: #E65100;
         }}
         .alert-error {{
             background-color: rgba(244, 67, 54, 0.1);
             border-color: #F44336;
-            color: #F44336;
+            color: #C62828;
         }}
         
         /* Barra de progreso */
         .progress-bar {{
-            background-color: #333333;
+            background-color: #E9ECEF;
             border-radius: 10px;
             overflow: hidden;
             height: 10px;
@@ -218,7 +221,7 @@ def apply_custom_styles():
         
         /* Spinner personalizado */
         .spinner {{
-            border: 4px solid #333333;
+            border: 4px solid #E9ECEF;
             border-top: 4px solid {theme['secondary_color']};
             border-radius: 50%;
             width: 40px;

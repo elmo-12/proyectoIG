@@ -470,7 +470,7 @@ class UIComponents:
             yaxis_title=t('diagnosis.probability'),
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(color='white'),
+            font=dict(color='black'),
             showlegend=False,
             yaxis=dict(
                 range=[0, 100],
@@ -517,12 +517,13 @@ class UIComponents:
             st.markdown(
                 f"""
                 <div style='
-                    background-color: rgba(37, 37, 37, 0.8);
+                    background-color: rgba(248, 249, 250, 0.8);
                     margin: 0.5rem 0;
                     padding: 0.75rem;
                     border-radius: 5px;
                     border-left: 4px solid {color};
-                    color: #E0E0E0;
+                    color: #262730;
+                    border: 1px solid #E9ECEF;
                 '>
                     <span style='font-size: 1.1em; font-weight: bold;'>{info['name']}</span>
                     <br/>

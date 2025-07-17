@@ -50,12 +50,12 @@ class ChartGenerator:
         bars = ax.bar(class_names, probabilities, color=colors, alpha=0.8)
         
         # Configurar ejes con traducciones
-        ax.set_ylabel(t('charts.probability_percent'), color='white', fontsize=12)
+        ax.set_ylabel(t('charts.probability_percent'), color='black', fontsize=12)
         chart_title = title or t('charts.probability_distribution')
-        ax.set_title(chart_title, color='white', fontsize=14, fontweight='bold')
+        ax.set_title(chart_title, color='black', fontsize=14, fontweight='bold')
         ax.set_ylim([0, 100])
-        plt.xticks(rotation=45, ha='right', color='white')
-        ax.tick_params(axis='y', colors='white')
+        plt.xticks(rotation=45, ha='right', color='black')
+        ax.tick_params(axis='y', colors='black')
         
         # Añadir valores sobre las barras
         for bar in bars:
@@ -66,10 +66,13 @@ class ChartGenerator:
                 f'{height:.1f}%',
                 ha='center',
                 va='bottom',
-                color='white',
+                color='black',
                 fontweight='bold',
                 fontsize=10
             )
+        
+        # Añadir grid suave para mejor legibilidad
+        ax.grid(True, linestyle='--', alpha=0.3, color='gray')
         
         # Ajustar diseño
         plt.tight_layout()
@@ -169,19 +172,22 @@ class ChartGenerator:
                 if height > 5:  # Solo mostrar si la probabilidad es mayor a 5%
                     ax.text(bar.get_x() + bar.get_width()/2., height + 1,
                            f'{height:.1f}%', ha='center', va='bottom',
-                           color='white', fontsize=8, fontweight='bold')
+                           color='black', fontsize=8, fontweight='bold')
         
         # Configurar ejes con traducciones
-        ax.set_ylabel(t('charts.probability_percent'), color='white', fontsize=12)
-        ax.set_xlabel(t('charts.disease_classes'), color='white', fontsize=12)
+        ax.set_ylabel(t('charts.probability_percent'), color='black', fontsize=12)
+        ax.set_xlabel(t('charts.disease_classes'), color='black', fontsize=12)
         chart_title = title or t('charts.model_comparison')
-        ax.set_title(chart_title, color='white', fontsize=16, fontweight='bold')
+        ax.set_title(chart_title, color='black', fontsize=16, fontweight='bold')
         ax.set_xticks(x + width)
-        ax.set_xticklabels(class_names, rotation=45, ha='right', color='white')
-        ax.tick_params(axis='y', colors='white')
-        ax.legend(loc='upper right', facecolor=self.config['background_color'], 
-                 edgecolor='white', labelcolor='white')
+        ax.set_xticklabels(class_names, rotation=45, ha='right', color='black')
+        ax.tick_params(axis='y', colors='black')
+        ax.legend(loc='upper right', facecolor='white', 
+                 edgecolor='black', labelcolor='black')
         ax.set_ylim([0, 100])
+        
+        # Añadir grid suave para mejor legibilidad
+        ax.grid(True, linestyle='--', alpha=0.3, color='gray')
         
         plt.tight_layout()
         return fig
@@ -288,7 +294,7 @@ class ChartGenerator:
         fig.update_layout(
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
-            font={'color': 'white'}
+            font={'color': 'black'}
         )
         
         return fig
@@ -305,11 +311,11 @@ class ChartGenerator:
         """
         fig = go.Figure(data=[go.Table(
             header=dict(values=list(models_data.columns),
-                       fill_color='darkgray',
+                       fill_color='lightgray',
                        align='left',
-                       font=dict(color='white', size=12)),
+                       font=dict(color='black', size=12)),
             cells=dict(values=[models_data[col] for col in models_data.columns],
-                      fill_color='lightgray',
+                      fill_color='white',
                       align='left',
                       font=dict(color='black', size=11))
         )])
@@ -318,7 +324,7 @@ class ChartGenerator:
             title=t('charts.detailed_model_comparison'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
-            font={'color': 'white'}
+            font={'color': 'black'}
         )
         
         return fig
@@ -359,17 +365,17 @@ class ChartGenerator:
                 radialaxis=dict(
                     visible=True,
                     range=[0, 100],
-                    gridcolor='white'
+                    gridcolor='lightgray'
                 ),
                 angularaxis=dict(
-                    gridcolor='white'
+                    gridcolor='lightgray'
                 )
             ),
             showlegend=True,
             title=t('charts.model_performance'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
-            font={'color': 'white'}
+            font={'color': 'black'}
         )
         
         return fig
@@ -403,7 +409,7 @@ class ChartGenerator:
             title=t('charts.average_predictions_distribution'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
-            font={'color': 'white'}
+            font={'color': 'black'}
         )
         
         return fig
@@ -444,7 +450,7 @@ class ChartGenerator:
             yaxis_title=t('charts.accuracy'),
             paper_bgcolor=self.config['background_color'],
             plot_bgcolor=self.config['background_color'],
-            font={'color': 'white'}
+            font={'color': 'black'}
         )
         
         return fig
